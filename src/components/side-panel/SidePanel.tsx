@@ -23,6 +23,7 @@ import { useLiveAPIContext } from "../../../src/contexts/LiveAPIContext";
 import { useLoggerStore } from "../../../src/lib/store-logger";
 import Logger, { LoggerFilterType } from "../logger/Logger";
 import "./side-panel.scss";
+import { useAuth } from "../../../src/contexts/AuthContext";
 
 const filterOptions = [
   { value: "conversations", label: "Conversations" },
@@ -32,6 +33,7 @@ const filterOptions = [
 
 export default function SidePanel() {
   const { connected, client } = useLiveAPIContext();
+  const { logOut } = useAuth();
   const [open, setOpen] = useState(true);
   const loggerRef = useRef<HTMLDivElement>(null);
   const loggerLastHeightRef = useRef<number>(-1);
@@ -73,19 +75,32 @@ export default function SidePanel() {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={`side-panel ${open ? "open" : ""}`}>
       <header className="top">
         <h2>Console</h2>
-        {open ? (
-          <button className="opener" onClick={() => setOpen(false)}>
-            <RiSidebarFoldLine color="#b4b8bb" />
+        <div className="top-right-controls">
+          <button onClick={handleSignOut} className="sign-out-button">
+            Sign Out
           </button>
-        ) : (
-          <button className="opener" onClick={() => setOpen(true)}>
-            <RiSidebarUnfoldLine color="#b4b8bb" />
-          </button>
-        )}
+          {open ? (
+            <button className="opener" onClick={() => setOpen(false)}>
+              <RiSidebarFoldLine color="#b4b8bb" />
+            </button>
+          ) : (
+            <button className="opener" onClick={() => setOpen(true)}>
+              <RiSidebarUnfoldLine color="#b4b8bb" />
+            </button>
+          )}
+        </div>
       </header>
       <section className="indicators">
         <Select
