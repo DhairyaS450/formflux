@@ -1,5 +1,5 @@
 import { RiSidebarFoldLine, RiSidebarUnfoldLine } from "react-icons/ri";
-import { FaDiscord, FaHome, FaCalendarAlt, FaUsers, FaShareAlt, FaTicketAlt, FaCog, FaMapMarkerAlt, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaDiscord, FaHome, FaCog, FaUser, FaSignOutAlt } from "react-icons/fa";
 import "./side-panel.scss";
 import { useAuth } from "../../../src/contexts/AuthContext";
 import { useState } from "react";
@@ -37,33 +37,11 @@ export default function SidePanel() {
         <div className="side-panel-content">
           <nav className="navigation">
             <div className="nav-section">
-              <div className="section-header">Support</div>
-              <ul className="nav-list">
-                <li className="nav-item">
-                  <FaDiscord className="nav-icon" />
-                  <span className="nav-text">Discord Support</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="nav-section">
               <div className="section-header">Main</div>
               <ul className="nav-list">
                 <li className="nav-item active">
                   <FaHome className="nav-icon" />
                   <span className="nav-text">Home</span>
-                </li>
-                <li className="nav-item">
-                  <FaCalendarAlt className="nav-icon" />
-                  <span className="nav-text">Schedule</span>
-                </li>
-                <li className="nav-item">
-                  <FaUsers className="nav-icon" />
-                  <span className="nav-text">Community</span>
-                </li>
-                <li className="nav-item">
-                  <FaShareAlt className="nav-icon" />
-                  <span className="nav-text">Share</span>
                 </li>
               </ul>
             </div>
@@ -74,10 +52,6 @@ export default function SidePanel() {
                 <li className="nav-item">
                   <FaCog className="nav-icon" />
                   <span className="nav-text">Account</span>
-                </li>
-                <li className="nav-item">
-                  <FaMapMarkerAlt className="nav-icon" />
-                  <span className="nav-text">Location</span>
                 </li>
               </ul>
             </div>

@@ -10,12 +10,6 @@ interface LandingPageProps {
 const LandingPage: React.FC<LandingPageProps> = ({ handleSignIn }) => {
   return (
     <div className="landing-container">
-      <header className="landing-header">
-        <div className="logo-container">
-          <Image src="/logo.png" alt="FormFlux Logo" width={150} height={50} />
-        </div>
-      </header>
-      
       <main className="landing-main">
         <div className="hero-section">
           <h1>Your Personal AI Fitness Coach</h1>
