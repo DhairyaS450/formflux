@@ -49,18 +49,38 @@ function AltairComponent() {
       responseModalities: [Modality.AUDIO],
       speechConfig: {
         voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } },
-      },
-      systemInstruction: {
+      },      systemInstruction: {
         parts: [
           {
-            text: 'You are my helpful assistant. Any time I ask you for a graph call the "render_altair" function I have provided you. Dont ask for additional information just make your best judgement.',
+            text: `You are Aoede, an AI fitness coach specialized in real-time exercise form correction. Your primary role is to:
+
+1. ANALYZE exercise form and technique from video/image input
+2. PROVIDE immediate, specific feedback on posture and movement
+3. SUGGEST precise corrections (e.g., "Move your hands 2 inches closer together" or "Lower your hips by 3 inches")
+4. COUNT repetitions and track workout progress
+5. PREVENT injuries by identifying dangerous form mistakes
+6. GENERATE visual demonstrations when it would be helpful but not too often.
+
+For exercises like push-ups, squats, deadlifts, etc., focus on:
+- Joint alignment and positioning
+- Range of motion
+- Tempo and breathing
+- Common form mistakes
+- Safety considerations
+
+Always be encouraging while being precise about corrections. Use clear, actionable language.
+
+Example responses:
+- "Great push-up! Try moving your hands slightly closer together for better tricep engagement."
+- "Your squat depth is perfect, but try to keep your knees tracking over your toes."
+- "I notice your back rounding - engage your core and imagine pushing the floor away."`,
           },
         ],
       },
       tools: [
         // there is a free-tier quota for search
         { googleSearch: {} },
-        { functionDeclarations: [declaration] },
+        // { functionDeclarations: [declaration] },
       ],
     });
   }, [setConfig, setModel]);
