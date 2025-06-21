@@ -149,10 +149,13 @@ body {
   }
 
   .main-app-area {
+    position: relative;
     display: flex;
     flex: 1;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
   }
 
   .function-call {
@@ -167,7 +170,37 @@ body {
 /* video player */
 .stream {
   flex-grow: 1;
-  max-width: 90%;
+  max-width: 100%;
   border-radius: 32px;
   max-height: fit-content;
+}
+
+.counter {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: var(--Neutral-5);
+  border-radius: 12px;
+  border: 2px solid var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--text);
+  z-index: 10000;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

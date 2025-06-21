@@ -81,7 +81,7 @@ export default function Home() {
               // Active workout interface
               <main>
                 <div className="main-app-area">
-                  <div className="rep-counter">Reps: {repCount}</div>
+                  <div className="counter">{repCount}</div>
                   {/* AI chat interface */}
                   <Altair onRepCount={handleRepCount} />
                   {/* Video stream display */}
