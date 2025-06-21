@@ -23,8 +23,10 @@ export default function SettingsDialog() {
       return [];
     }
     return (config.tools as Tool[])
-      .filter((t: Tool): t is FunctionDeclarationsTool =>
-        Array.isArray((t as any).functionDeclarations)
+      .filter(
+        (t: Tool): t is FunctionDeclarationsTool =>
+          "functionDeclarations" in t &&
+          Array.isArray((t as FunctionDeclarationsTool).functionDeclarations)
       )
       .map((t) => t.functionDeclarations)
       .filter((fc) => !!fc)

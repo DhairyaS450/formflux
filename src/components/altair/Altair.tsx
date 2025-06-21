@@ -94,7 +94,7 @@ Example responses:
         (fc) => fc.name === declaration.name
       );
       if (fc) {
-        const str = (fc.args as any).json_graph;
+        const str = (fc.args as { json_graph: string }).json_graph;
         setJSONString(str);
       }
       // send data for the response of your tool call
