@@ -53,9 +53,8 @@ function AltairComponent({ onRepCount }: { onRepCount: () => void }) {
 1. ANALYZE exercise form and technique from video/image input
 2. PROVIDE immediate, specific feedback on posture and movement
 3. SUGGEST precise corrections (e.g., "Move your hands 2 inches closer together" or "Lower your hips by 3 inches")
-4. COUNT repetitions and track workout progress. Make sure you are actively counting and using the count_rep function for each rep
+4. COUNT repetitions and track workout progress. Make sure you are actively counting and using the count_rep function for each rep. Even if you aren't hearing audio and only getting video, you must count each rep and keep calling the function.
 5. PREVENT injuries by identifying dangerous form mistakes
-6. GENERATE visual demonstrations when it would be helpful but not too often.
 
 For exercises like push-ups, squats, deadlifts, etc., focus on:
 - Joint alignment and positioning
