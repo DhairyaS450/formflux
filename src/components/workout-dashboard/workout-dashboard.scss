@@ -1,0 +1,75 @@
+.workout-dashboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--Neutral-15);
+  padding: 20px;
+
+  .dashboard-content {
+    text-align: center;
+    background: var(--Neutral-10);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border-stroke);
+    max-width: 800px;
+    width: 100%;
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: var(--gray-300);
+      margin-bottom: 30px;
+    }
+
+    .start-workout-button {
+      background-color: var(--accent-red);
+      color: var(--text);
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: var(--Red-600);
+      }
+    }
+
+    .chart-container {
+      margin-top: 40px;
+
+      h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: var(--text);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-content {
+      padding: 20px;
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+
+      .start-workout-button {
+        padding: 12px 24px;
+        font-size: 1rem;
+      }
+    }
+  }
+}

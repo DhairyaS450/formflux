@@ -9,6 +9,7 @@ import cn from "classnames";
 import { LiveClientOptions } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import LandingPage from "@/components/landing-page/LandingPage";
+import WorkoutDashboard from "@/components/workout-dashboard/WorkoutDashboard";
 
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY as string;
 if (typeof API_KEY !== "string") {
@@ -21,11 +22,9 @@ const apiOptions: LiveClientOptions = {
 
 export default function Home() {
   const { user, googleSignIn } = useAuth();
-  // this video reference is used for displaying the active stream, whether that is the webcam or screen capture
-  // feel free to style as you see fit
   const videoRef = useRef<HTMLVideoElement>(null);
-  // either the screen capture, the video or null, if null we hide it
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  const [workoutStarted, setWorkoutStarted] = useState(false);
 
   const handleSignIn = async () => {
     try {
@@ -35,35 +34,47 @@ export default function Home() {
     }
   };
 
+  const handleStartWorkout = () => {
+    setWorkoutStarted(true);
+  };
+
+  const handleStopWorkout = () => {
+    setWorkoutStarted(false);
+    setVideoStream(null);
+  };
+
   return (
     <div className="App">
       {user ? (
         <LiveAPIProvider options={apiOptions}>
           <div className="streaming-console">
             <SidePanel />
-            <main>
-              <div className="main-app-area">
-                {/* APP goes here */}
-                <Altair />
-                <video
-                  className={cn("stream", {
-                    hidden: !videoRef.current || !videoStream,
-                  })}
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                />
-              </div>
+            {workoutStarted ? (
+              <main>
+                <div className="main-app-area">
+                  <Altair />
+                  <video
+                    className={cn("stream", {
+                      hidden: !videoRef.current || !videoStream,
+                    })}
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                  />
+                </div>
 
-              <ControlTray
-                videoRef={videoRef}
-                supportsVideo={true}
-                onVideoStreamChange={setVideoStream}
-                enableEditingSettings={true}
-              >
-                {/* put your own buttons here */}
-              </ControlTray>
-            </main>
+                <ControlTray
+                  videoRef={videoRef}
+                  supportsVideo={true}
+                  onVideoStreamChange={setVideoStream}
+                  onStopWorkout={handleStopWorkout}
+                />
+              </main>
+            ) : (
+              <main>
+                <WorkoutDashboard onStartWorkout={handleStartWorkout} />
+              </main>
+            )}
           </div>
         </LiveAPIProvider>
       ) : (

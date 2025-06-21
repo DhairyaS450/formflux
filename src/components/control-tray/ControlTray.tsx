@@ -17,22 +17,28 @@
 
 import cn from "classnames";
 
-import { memo, ReactNode, RefObject, useEffect, useRef, useState } from "react";
+import {
+  memo,
+  ReactNode,
+  RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useLiveAPIContext } from "@/contexts/LiveAPIContext";
 import { UseMediaStreamResult } from "@/hooks/use-media-stream-mux";
-import { useScreenCapture } from "@/hooks/use-screen-capture";
 import { useWebcam } from "@/hooks/use-webcam";
 import { AudioRecorder } from "@/lib/audio-recorder";
 import AudioPulse from "@/components/audio-pulse/AudioPulse";
 import "./control-tray.scss";
-import SettingsDialog from "@/components/settings-dialog/SettingsDialog";
 
 export type ControlTrayProps = {
   videoRef: RefObject<HTMLVideoElement | null>;
   children?: ReactNode;
   supportsVideo: boolean;
   onVideoStreamChange?: (stream: MediaStream | null) => void;
-  enableEditingSettings?: boolean;
+  onStopWorkout: () => void;
 };
 
 type MediaStreamButtonProps = {
@@ -64,12 +70,11 @@ function ControlTray({
   children,
   onVideoStreamChange = () => {},
   supportsVideo,
-  enableEditingSettings,
+  onStopWorkout,
 }: ControlTrayProps) {
-  const videoStreams = [useWebcam(), useScreenCapture()];
   const [activeVideoStream, setActiveVideoStream] =
     useState<MediaStream | null>(null);
-  const [webcam, screenCapture] = videoStreams;
+  const webcam = useWebcam();
   const [inVolume, setInVolume] = useState(0);
   const [audioRecorder] = useState(() => new AudioRecorder());
   const [muted, setMuted] = useState(false);
@@ -79,11 +84,26 @@ function ControlTray({
   const { client, connected, connect, disconnect, volume } =
     useLiveAPIContext();
 
+  const changeStreams = useCallback(
+    (streamer: UseMediaStreamResult) => async () => {
+      if (webcam.isStreaming) {
+        webcam.stop();
+      }
+      const stream = await streamer.start();
+      setActiveVideoStream(stream);
+      onVideoStreamChange(stream);
+
+      return stream;
+    },
+    [webcam, onVideoStreamChange]
+  );
+
   useEffect(() => {
-    if (!connected && connectButtonRef.current) {
-      connectButtonRef.current.focus();
+    if (webcam && !webcam.isStreaming) {
+      changeStreams(webcam)();
     }
-  }, [connected]);
+  }, [webcam, changeStreams]);
+
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--volume",
@@ -146,20 +166,6 @@ function ControlTray({
     };
   }, [connected, activeVideoStream, client, videoRef]);
 
-  //handler for swapping from one video-stream to the next
-  const changeStreams = (streamer: UseMediaStreamResult) => async () => {
-    if (screenCapture.isStreaming) {
-      screenCapture.stop();
-    } else if (webcam.isStreaming) {
-      webcam.stop();
-    }
-    const stream = await streamer.start();
-    setActiveVideoStream(stream);
-    onVideoStreamChange(stream);
-
-    return stream;
-  };
-
   return (
     <section className="control-tray">
       <canvas style={{ display: "none" }} ref={renderCanvasRef} />
@@ -181,13 +187,6 @@ function ControlTray({
 
         {supportsVideo && (
           <>
-            <MediaStreamButton
-              isStreaming={screenCapture.isStreaming}
-              onIcon="stop_screen_share"
-              offIcon="screen_share"
-              start={changeStreams(screenCapture)}
-              stop={screenCapture.stop}
-            />
             <MediaStreamButton
               isStreaming={webcam.isStreaming}
               onIcon="videocam_off"
@@ -214,7 +213,9 @@ function ControlTray({
         </div>
         <span className="text-indicator">Streaming</span>
       </div>
-      {enableEditingSettings ? <SettingsDialog /> : ""}
+      <button className="action-button" onClick={onStopWorkout}>
+        <span className="material-symbols-outlined">stop</span>
+      </button>
     </section>
   );
 }
