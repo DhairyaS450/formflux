@@ -273,11 +273,11 @@ function ControlTray({
         {/* Connection status text */}
         <span className="text-indicator">Streaming</span>
       </div>
-      
-      {/* Stop workout button */}
-      <button className="action-button" onClick={onStopWorkout}>
-        <span className="material-symbols-outlined">stop</span>
-      </button>
+      <div className="connection-button-container">
+        <button className="action-button stop-button" onClick={onStopWorkout}>
+          <span className="material-symbols-outlined">stop</span>
+        </button>
+      </div>
     </section>
   );
 }
