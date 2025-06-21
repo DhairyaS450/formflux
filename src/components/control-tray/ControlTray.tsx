@@ -181,10 +181,6 @@ function ControlTray({
           )}
         </button>
 
-        <div className="action-button no-action outlined">
-          <AudioPulse volume={volume} active={connected} hover={false} />
-        </div>
-
         {supportsVideo && (
           <>
             <MediaStreamButton

@@ -15,8 +15,12 @@ type FunctionDeclarationsTool = Tool & {
   functionDeclarations: FunctionDeclaration[];
 };
 
-export default function SettingsDialog() {
-  const [open, setOpen] = useState(false);
+export type SettingsDialogProps = {
+  open: boolean;
+  onClose: () => void;
+};
+
+export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   const { config, setConfig, connected } = useLiveAPIContext();
   const functionDeclarations: FunctionDeclaration[] = useMemo(() => {
     if (!Array.isArray(config.tools)) {
@@ -93,15 +97,17 @@ export default function SettingsDialog() {
     [config, setConfig]
   );
 
+  if (!open) {
+    return null;
+  }
+
   return (
-    <div className="settings-dialog">
-      <button
-        className="action-button material-symbols-outlined"
-        onClick={() => setOpen(!open)}
+    <div className="settings-dialog-overlay" onClick={onClose}>
+      <dialog
+        className="dialog"
+        open={open}
+        onClick={(e) => e.stopPropagation()}
       >
-        settings
-      </button>
-      <dialog className="dialog" style={{ display: open ? "block" : "none" }}>
         <div className={`dialog-container ${connected ? "disabled" : ""}`}>
           {connected && (
             <div className="connected-indicator">
