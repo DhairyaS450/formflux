@@ -233,9 +233,9 @@ function ControlTray({
           onClick={() => setMuted(!muted)}
         >
           {!muted ? (
-            <span className="material-symbols-outlined filled">mic</span>
+            <span className="material-symbols-outlined">mic</span>
           ) : (
-            <span className="material-symbols-outlined filled">mic_off</span>
+            <span className="material-symbols-outlined">mic_off</span>
           )}
         </button>
 
@@ -265,7 +265,7 @@ function ControlTray({
             className={cn("action-button connect-toggle", { connected })}
             onClick={connected ? disconnect : connect}
           >
-            <span className="material-symbols-outlined filled">
+            <span className="material-symbols-outlined">
               {connected ? "pause" : "play_arrow"}
             </span>
           </button>

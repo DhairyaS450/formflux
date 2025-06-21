@@ -25,9 +25,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Material Symbols font with better loading strategy */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=optional"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        />
+        {/* Regular Material Icons as fallback */}
+        <link 
+          rel="stylesheet" 
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
         />
       </head>
       <body
