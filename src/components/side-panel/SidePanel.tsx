@@ -1,58 +1,108 @@
 import { RiSidebarFoldLine, RiSidebarUnfoldLine } from "react-icons/ri";
-import { FaDiscord, FaHome, FaCalendarAlt, FaUsers, FaShareAlt, FaTicketAlt, FaCog, FaMapMarkerAlt } from "react-icons/fa";
+import { FaDiscord, FaHome, FaCalendarAlt, FaUsers, FaShareAlt, FaTicketAlt, FaCog, FaMapMarkerAlt, FaUser, FaSignOutAlt } from "react-icons/fa";
 import "./side-panel.scss";
 import { useAuth } from "../../../src/contexts/AuthContext";
 import { useState } from "react";
 
 export default function SidePanel() {
   const [open, setOpen] = useState(true);
+  const { user, logOut } = useAuth();
 
+  const handleSignOut = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <div className={`side-panel ${open ? "open" : ""}`}>
-      <header className="top">
-        <h2>Console</h2>
-        {open ? (
-          <button className="opener" onClick={() => setOpen(false)}>
-            <RiSidebarFoldLine color="#b4b8bb" />
-          </button>
-        ) : (
-          <button className="opener" onClick={() => setOpen(true)}>
-            <RiSidebarUnfoldLine color="#b4b8bb" />
-          </button>
-        )}
-      </header>
-      {open && (
-        <>
-          <nav className="menu">
-            <ul>
-              <li>
-                <FaDiscord /> <span>Discord Support</span>
-              </li>
-            </ul>
-            <div className="section-label">MAIN</div>
-            <ul>
-              <li className="active">
-                <FaHome /> <span>Home</span>
-              </li>
-              <li>
-                <FaCalendarAlt /> <span>Schedule</span>
-              </li>
-            </ul>
-            <div className="section-label">SETTINGS</div>
-            <ul>
-              <li>
-                <FaCog /> <span>Account</span>
-              </li>
-            </ul>
-          </nav>
-          <div className="profile-bar">
-            <div className="profile-info">
-              <div className="profile-pic" />
-            </div>
-            <button className="profile-expand">{/* Add expand icon if needed */}</button>
+      <header className="side-panel-header">
+        {open && (
+          <div className="logo-section">
+            <img src="/logo.png" alt="FormFlux Logo" className="logo" />
           </div>
-        </>
+        )}
+        <button className="toggle-button" onClick={() => setOpen(!open)}>
+          {open ? (
+            <RiSidebarFoldLine />
+          ) : (
+            <RiSidebarUnfoldLine />
+          )}
+        </button>
+      </header>
+
+      {open && (
+        <div className="side-panel-content">
+          <nav className="navigation">
+            <div className="nav-section">
+              <div className="section-header">Support</div>
+              <ul className="nav-list">
+                <li className="nav-item">
+                  <FaDiscord className="nav-icon" />
+                  <span className="nav-text">Discord Support</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="nav-section">
+              <div className="section-header">Main</div>
+              <ul className="nav-list">
+                <li className="nav-item active">
+                  <FaHome className="nav-icon" />
+                  <span className="nav-text">Home</span>
+                </li>
+                <li className="nav-item">
+                  <FaCalendarAlt className="nav-icon" />
+                  <span className="nav-text">Schedule</span>
+                </li>
+                <li className="nav-item">
+                  <FaUsers className="nav-icon" />
+                  <span className="nav-text">Community</span>
+                </li>
+                <li className="nav-item">
+                  <FaShareAlt className="nav-icon" />
+                  <span className="nav-text">Share</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="nav-section">
+              <div className="section-header">Settings</div>
+              <ul className="nav-list">
+                <li className="nav-item">
+                  <FaCog className="nav-icon" />
+                  <span className="nav-text">Account</span>
+                </li>
+                <li className="nav-item">
+                  <FaMapMarkerAlt className="nav-icon" />
+                  <span className="nav-text">Location</span>
+                </li>
+              </ul>
+            </div>
+          </nav>
+
+          <div className="user-section">
+            <div className="user-profile">
+              <div className="user-avatar">
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" />
+                ) : (
+                  <FaUser />
+                )}
+              </div>
+              <div className="user-info">
+                <div className="user-name">{user?.displayName || "User"}</div>
+                <div className="user-email">{user?.email}</div>
+              </div>
+            </div>
+            <button className="sign-out-button" onClick={handleSignOut}>
+              <FaSignOutAlt />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
