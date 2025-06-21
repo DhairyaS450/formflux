@@ -20,7 +20,7 @@
  */
 export type WorkletGraph = {
   node?: AudioWorkletNode;
-  handlers: Array<(this: MessagePort, ev: MessageEvent) => MessageEvent>;
+  handlers: Array<(this: MessagePort, ev: MessageEvent) => void>;
 };
 
 export const registeredWorklets: Map<

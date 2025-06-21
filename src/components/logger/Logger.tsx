@@ -18,7 +18,7 @@
 import "./logger.scss";
 
 import cn from "classnames";
-import { memo, ReactNode } from "react";
+import React, { memo, ReactNode } from "react";
 import { useLoggerStore } from "../../../src/lib/store-logger";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { vs2015 as dark } from "react-syntax-highlighter/dist/esm/styles/hljs";
@@ -48,7 +48,7 @@ const LogEntry = memo(
     }: {
       message: StreamingLog["message"];
     }) => ReactNode;
-  }): JSX.Element => (
+  }) => (
     <li
       className={cn(
         `plain-log`,
@@ -85,7 +85,7 @@ function tryParseCodeExecutionResult(output: string) {
   try {
     const json = JSON.parse(output);
     return JSON.stringify(json, null, "  ");
-  } catch (e) {
+  } catch {
     return output;
   }
 }
@@ -147,7 +147,7 @@ const ToolCallLog = memo(({ message }: Message) => {
   const { toolCall } = message as { toolCall: LiveServerToolCall };
   return (
     <div className={cn("rich-log tool-call")}>
-      {toolCall.functionCalls?.map((fc, i) => (
+      {toolCall.functionCalls?.map((fc) => (
         <div key={fc.id} className="part part-functioncall">
           <h5>Function call: {fc.name}</h5>
           <SyntaxHighlighter language="json" style={dark}>
@@ -159,7 +159,7 @@ const ToolCallLog = memo(({ message }: Message) => {
   );
 });
 
-const ToolCallCancellationLog = ({ message }: Message): JSX.Element => (
+const ToolCallCancellationLog = ({ message }: Message) => (
   <div className={cn("rich-log tool-call-cancellation")}>
     <span>
       {" "}
@@ -176,7 +176,7 @@ const ToolCallCancellationLog = ({ message }: Message): JSX.Element => (
 );
 
 const ToolResponseLog = memo(
-  ({ message }: Message): JSX.Element => (
+  ({ message }: Message) => (
     <div className={cn("rich-log tool-response")}>
       {(message as LiveClientToolResponse).functionResponses?.map((fc) => (
         <div key={`tool-response-${fc.id}`} className="part">
@@ -190,7 +190,7 @@ const ToolResponseLog = memo(
   )
 );
 
-const ModelTurnLog = ({ message }: Message): JSX.Element => {
+const ModelTurnLog = ({ message }: Message) => {
   const serverContent = (message as { serverContent: LiveServerContent })
     .serverContent;
   const { modelTurn } = serverContent as { modelTurn: Content };
