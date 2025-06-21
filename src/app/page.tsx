@@ -10,6 +10,7 @@ import { LiveClientOptions } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import LandingPage from "@/components/landing-page/LandingPage";
 import WorkoutDashboard from "@/components/workout-dashboard/WorkoutDashboard";
+import SettingsDialog from "@/components/settings-dialog/SettingsDialog";
 
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY as string;
 if (typeof API_KEY !== "string") {
@@ -25,6 +26,7 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [workoutStarted, setWorkoutStarted] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleSignIn = async () => {
     try {
@@ -48,7 +50,7 @@ export default function Home() {
       {user ? (
         <LiveAPIProvider options={apiOptions}>
           <div className="streaming-console">
-            <SidePanel />
+            <SidePanel onSettingsClick={() => setSettingsOpen(true)} />
             {workoutStarted ? (
               <main>
                 <div className="main-app-area">
@@ -76,6 +78,10 @@ export default function Home() {
               </main>
             )}
           </div>
+          <SettingsDialog
+            open={settingsOpen}
+            onClose={() => setSettingsOpen(false)}
+          />
         </LiveAPIProvider>
       ) : (
         <LandingPage handleSignIn={handleSignIn} />
