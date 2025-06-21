@@ -39,6 +39,7 @@ export default function Home() {
   const [workoutStarted, setWorkoutStarted] = useState(false);
   // Settings dialog visibility state
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [repCount, setRepCount] = useState(0);
 
   // Handle Google authentication
   const handleSignIn = async () => {
@@ -52,12 +53,17 @@ export default function Home() {
   // Start workout session - transition to workout interface
   const handleStartWorkout = () => {
     setWorkoutStarted(true);
+    setRepCount(0);
   };
 
   // Stop workout session - return to dashboard
   const handleStopWorkout = () => {
     setWorkoutStarted(false);
     setVideoStream(null);
+  };
+
+  const handleRepCount = () => {
+    setRepCount((reps) => reps + 1);
   };
 
   return (
@@ -75,8 +81,9 @@ export default function Home() {
               // Active workout interface
               <main>
                 <div className="main-app-area">
+                  <div className="rep-counter">Reps: {repCount}</div>
                   {/* AI chat interface */}
-                  <Altair />
+                  <Altair onRepCount={handleRepCount} />
                   {/* Video stream display */}
                   <video
                     className={cn("stream", {

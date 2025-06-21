@@ -23,23 +23,18 @@ import {
   Type,
 } from "@google/genai";
 
-const declaration: FunctionDeclaration = {
-  name: "render_altair",
-  description: "Displays an altair graph in json format.",
+
+
+const repCountDeclaration: FunctionDeclaration = {
+  name: "count_rep",
+  description: "Increments the rep counter by one.",
   parameters: {
     type: Type.OBJECT,
-    properties: {
-      json_graph: {
-        type: Type.STRING,
-        description:
-          "JSON STRING representation of the graph to render. Must be a string, not a json object",
-      },
-    },
-    required: ["json_graph"],
+    properties: {},
   },
 };
 
-function AltairComponent() {
+function AltairComponent({ onRepCount }: { onRepCount: () => void }) {
   const [jsonString, setJSONString] = useState<string>("");
   const { client, setConfig, setModel } = useLiveAPIContext();
 
@@ -58,7 +53,7 @@ function AltairComponent() {
 1. ANALYZE exercise form and technique from video/image input
 2. PROVIDE immediate, specific feedback on posture and movement
 3. SUGGEST precise corrections (e.g., "Move your hands 2 inches closer together" or "Lower your hips by 3 inches")
-4. COUNT repetitions and track workout progress. Make sure you are actively counting.
+4. COUNT repetitions and track workout progress. Make sure you are actively counting and using the count_rep function for each rep
 5. PREVENT injuries by identifying dangerous form mistakes
 6. GENERATE visual demonstrations when it would be helpful but not too often.
 
@@ -81,7 +76,7 @@ Example responses:
       tools: [
         // there is a free-tier quota for search
         { googleSearch: {} },
-        // { functionDeclarations: [declaration] },
+        { functionDeclarations: [repCountDeclaration] },
       ],
     });
   }, [setConfig, setModel]);
@@ -91,13 +86,14 @@ Example responses:
       if (!toolCall.functionCalls) {
         return;
       }
-      const fc = toolCall.functionCalls.find(
-        (fc) => fc.name === declaration.name
+
+      const repFc = toolCall.functionCalls.find(
+        (fc) => fc.name === repCountDeclaration.name
       );
-      if (fc) {
-        const str = (fc.args as { json_graph: string }).json_graph;
-        setJSONString(str);
+      if (repFc) {
+        onRepCount();
       }
+
       // send data for the response of your tool call
       // in this case Im just saying it was successful
       if (toolCall.functionCalls.length) {
@@ -118,7 +114,7 @@ Example responses:
     return () => {
       client.off("toolcall", onToolCall);
     };
-  }, [client]);
+  }, [client, onRepCount]);
 
   const embedRef = useRef<HTMLDivElement>(null);
 
