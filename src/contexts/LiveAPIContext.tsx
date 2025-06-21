@@ -16,21 +16,32 @@
  * limitations under the License.
  */
 
+// React imports for context creation and usage
 import { createContext, FC, ReactNode, useContext } from "react";
+// Custom hook for Live API functionality
 import { useLiveAPI, UseLiveAPIResults } from "@/hooks/use-live-api";
+// Type definitions for API configuration
 import { LiveClientOptions } from "@/types";
 
+// Create the Live API context with undefined default value
 const LiveAPIContext = createContext<UseLiveAPIResults | undefined>(undefined);
 
+// Props interface for the Live API provider
 export type LiveAPIProviderProps = {
-  children: ReactNode;
-  options: LiveClientOptions;
+  children: ReactNode; // Child components to wrap
+  options: LiveClientOptions; // Configuration options for the Live API client
 };
 
+/**
+ * Live API Provider component
+ * Wraps the application with Live API functionality and provides
+ * real-time AI streaming capabilities to child components
+ */
 export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
   options,
   children,
 }) => {
+  // Initialize the Live API hook with provided options
   const liveAPI = useLiveAPI(options);
 
   return (
@@ -40,10 +51,19 @@ export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
   );
 };
 
+/**
+ * Custom hook to access the Live API context
+ * Provides access to AI streaming functionality including:
+ * - Connection management
+ * - Real-time input/output
+ * - Client state
+ * 
+ * @throws Error if used outside of LiveAPIProvider
+ */
 export const useLiveAPIContext = () => {
   const context = useContext(LiveAPIContext);
   if (!context) {
-    throw new Error("useLiveAPIContext must be used wihin a LiveAPIProvider");
+    throw new Error("useLiveAPIContext must be used within a LiveAPIProvider");
   }
   return context;
 };

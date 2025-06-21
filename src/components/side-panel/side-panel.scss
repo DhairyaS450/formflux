@@ -1,137 +1,161 @@
+/* Side Panel Component Styles */
+
+/* Main side panel container */
 .side-panel {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  min-width: 60px;
+  /* Layout and positioning */
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); // Dark gradient background
+  min-width: 60px; // Minimum width when collapsed
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  transition: all 0.3s ease;
-  font-family: var(--font-sans);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  position: relative;
-  backdrop-filter: blur(10px);
-  overflow: visible;
-  width: 60px;
+  height: 100vh; // Full viewport height
+  transition: all 0.3s ease; // Smooth transitions for all changes
+  font-family: var(--font-sans); // Use app's font family
+  
+  /* Visual styling */
+  border-right: 1px solid rgba(255, 255, 255, 0.1); // Subtle border
+  color: #fff; // White text
+  position: relative; // Positioning context
+  backdrop-filter: blur(10px); // Glass effect
+  overflow: visible; // Allow content to overflow for animations
+  width: 60px; // Default collapsed width
+  z-index: 1002;
 
+  /* Collapsed state styling */ 
   &.collapsed {
-    position: fixed;
-    background: transparent;
-    border-right: none;
-    backdrop-filter: none;
-    height: min-content;
+    position: fixed; // Fixed positioning when collapsed
+    background: transparent; // Transparent background
+    border-right: none; // No border
+    backdrop-filter: none; // No blur effect
+    height: min-content; // Only take needed height
 
+    /* Hide header content when collapsed */
     .side-panel-header {
       background: transparent;
       border-bottom: none;
 
       .logo-section {
-        display: none;
+        display: none; // Hide logo
       }
     }
 
+    /* Hide main content when collapsed */
     .side-panel-content {
-      display: none;
+      display: none; // Hide navigation and user section
     }
   }
 
+  /* Expanded state styling */
   &.open {
-    width: 280px;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    width: 280px; // Full width when expanded
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); // Restore background
   }
 
+  /* Header section containing logo and toggle button */
   .side-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); // Subtle separator
+    background: rgba(0, 0, 0, 0.3); // Semi-transparent background
 
+    /* Logo container */
     .logo-section {
-      flex: 1;
+      flex: 1; // Take available space
       
       .logo {
         height: 32px;
         width: auto;
-        object-fit: contain;
+        object-fit: contain; // Maintain aspect ratio
       }
     }
 
+    /* Toggle button for expand/collapse */
     .toggle-button {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1); // Semi-transparent background
+      border: 1px solid rgba(255, 255, 255, 0.2); // Subtle border
+      border-radius: 8px; // Rounded corners
       color: #fff;
       cursor: pointer;
       padding: 8px;
       font-size: 1.2rem;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
+      transition: all 0.3s ease; // Smooth hover effects
+      backdrop-filter: blur(10px); // Glass effect
 
+      /* Hover state */
       &:hover {
         background: rgba(255, 255, 255, 0.15);
         border-color: rgba(255, 255, 255, 0.3);
-        transform: translateY(-1px);
+        transform: translateY(-1px); // Slight lift effect
       }
     }
   }
 
+  /* Main content area */
   .side-panel-content {
-    flex: 1;
+    flex: 1; // Take remaining space
     display: flex;
     flex-direction: column;
     padding: 20px 0;
 
+    /* Navigation section */
     .navigation {
-      flex: 1;
+      flex: 1; // Take available space
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 32px; // Space between sections
 
+      /* Individual navigation sections */
       .nav-section {
         .section-header {
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(255, 255, 255, 0.6); // Muted text color
           font-size: 0.75rem;
           font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
+          text-transform: uppercase; // All caps
+          letter-spacing: 0.5px; // Spaced letters
           padding: 0 20px 12px;
           margin-bottom: 8px;
         }
 
+        /* Navigation list */
         .nav-list {
           list-style: none;
           padding: 0;
           margin: 0;
 
+          /* Individual navigation items */
           .nav-item {
             display: flex;
             align-items: center;
             padding: 12px 20px;
             margin: 0 8px;
-            border-radius: 12px;
+            border-radius: 12px; // Rounded corners
             cursor: pointer;
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease; // Smooth transitions
+            color: rgba(255, 255, 255, 0.8); // Slightly muted text
 
+            /* Hover state */
             &:hover {
-              background: rgba(255, 255, 255, 0.08);
-              color: #fff;
-              transform: translateX(4px);
+              background: rgba(255, 255, 255, 0.08); // Subtle highlight
+              color: #fff; // Full white text
+              transform: translateX(4px); // Slide right effect
             }
 
+            /* Active state */
             &.active {
-              background: rgba(255, 255, 255, 0.12);
+              background: rgba(255, 255, 255, 0.12); // More prominent highlight
               color: #fff;
-              border: 1px solid rgba(255, 255, 255, 0.2);
+              border: 1px solid rgba(255, 255, 255, 0.2); // Border for active state
             }
 
+            /* Navigation icon */
             .nav-icon {
               font-size: 1.1rem;
               margin-right: 12px;
-              min-width: 20px;
+              min-width: 20px; // Consistent icon width
             }
 
+            /* Navigation text */
             .nav-text {
               font-size: 0.9rem;
               font-weight: 500;
@@ -141,45 +165,51 @@
       }
     }
 
+    /* User profile and sign out section */
     .user-section {
       padding: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.1); // Separator line
+      background: rgba(0, 0, 0, 0.2); // Darker background
 
+      /* User profile container */
       .user-profile {
         display: flex;
         align-items: center;
         margin-bottom: 16px;
         padding: 12px;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.05); // Very subtle background
         border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1); // Subtle border
 
+        /* User avatar */
         .user-avatar {
           width: 40px;
           height: 40px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%; // Circular avatar
+          background: rgba(255, 255, 255, 0.1); // Fallback background
           display: flex;
           align-items: center;
           justify-content: center;
           margin-right: 12px;
-          overflow: hidden;
+          overflow: hidden; // Clip image to circle
 
+          /* Avatar image */
           img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover; // Maintain aspect ratio
           }
 
+          /* Default avatar icon */
           svg {
             font-size: 1.2rem;
             color: rgba(255, 255, 255, 0.7);
           }
         }
 
+        /* User information */
         .user-info {
-          flex: 1;
+          flex: 1; // Take remaining space
 
           .user-name {
             font-size: 0.9rem;
@@ -190,32 +220,35 @@
 
           .user-email {
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.6); // Muted color
           }
         }
       }
 
+      /* Sign out button */
       .sign-out-button {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 10px 16px;
-        background: rgba(255, 59, 48, 0.1);
-        border: 1px solid rgba(255, 59, 48, 0.3);
+        background: rgba(255, 59, 48, 0.1); // Red background
+        border: 1px solid rgba(255, 59, 48, 0.3); // Red border
         border-radius: 8px;
-        color: #ff3b30;
+        color: #ff3b30; // Red text
         cursor: pointer;
         font-size: 0.85rem;
         font-weight: 500;
-        transition: all 0.3s ease;
+        transition: all 0.3s ease; // Smooth transitions
 
+        /* Hover state */
         &:hover {
-          background: rgba(255, 59, 48, 0.15);
+          background: rgba(255, 59, 48, 0.15); // Darker red
           border-color: rgba(255, 59, 48, 0.5);
-          transform: translateY(-1px);
+          transform: translateY(-1px); // Lift effect
         }
 
+        /* Button icon */
         svg {
           margin-right: 8px;
           font-size: 1rem;
@@ -223,14 +256,17 @@
       }
     }
   }
-  // Responsive design
+
+  /* Responsive design for mobile devices */
   @media (max-width: 768px) {
+    /* Full width overlay on mobile when open */
     &.open {
       width: 100%;
       position: fixed;
-      z-index: 1000;
+      z-index: 1000; // High z-index for overlay
     }
 
+    /* Mobile header adjustments */
     .side-panel-header {
       padding: 20px 16px;
 
@@ -239,51 +275,53 @@
       }
     }
 
+    /* Mobile content adjustments */
     .side-panel-content {
       padding: 20px 0;
 
       .navigation {
-        gap: 28px;
+        gap: 28px; // Slightly less gap on mobile
 
         .nav-section {
           .section-header {
-            font-size: 0.85rem;
+            font-size: 0.85rem; // Larger text on mobile
             padding: 0 24px 14px;
           }
 
           .nav-list {
             .nav-item {
-              padding: 14px 20px;
+              padding: 14px 20px; // More padding on mobile
               margin: 0 8px;
 
               .nav-icon {
-                font-size: 1.2rem;
+                font-size: 1.2rem; // Larger icons on mobile
                 margin-right: 14px;
               }
 
               .nav-text {
-                font-size: 1rem;
+                font-size: 1rem; // Larger text on mobile
               }
             }
           }
         }
       }
 
+      /* Mobile user section adjustments */
       .user-section {
         padding: 20px;
 
         .user-profile {
-          padding: 14px;
+          padding: 14px; // More padding on mobile
 
           .user-avatar {
-            width: 44px;
+            width: 44px; // Larger avatar on mobile
             height: 44px;
             margin-right: 14px;
           }
 
           .user-info {
             .user-name {
-              font-size: 1rem;
+              font-size: 1rem; // Larger text on mobile
             }
 
             .user-email {
@@ -293,11 +331,11 @@
         }
 
         .sign-out-button {
-          padding: 12px 18px;
-          font-size: 0.95rem;
+          padding: 12px 18px; // More padding on mobile
+          font-size: 0.95rem; // Larger text on mobile
 
           svg {
-            font-size: 1.1rem;
+            font-size: 1.1rem; // Larger icon on mobile
           }
         }
       }
@@ -305,6 +343,7 @@
   }
 }
 
+/* Legacy styles for backward compatibility */
 .side-panel.open {
   width: 250px;
   height: 100vh;
