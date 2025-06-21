@@ -39,8 +39,8 @@ type MediaStreamButtonProps = {
   isStreaming: boolean;
   onIcon: string;
   offIcon: string;
-  start: () => Promise<any>;
-  stop: () => any;
+  start: () => Promise<MediaStream>;
+  stop: () => void;
 };
 
 /**
@@ -147,17 +147,17 @@ function ControlTray({
   }, [connected, activeVideoStream, client, videoRef]);
 
   //handler for swapping from one video-stream to the next
-  const changeStreams = (next?: UseMediaStreamResult) => async () => {
-    if (next) {
-      const mediaStream = await next.start();
-      setActiveVideoStream(mediaStream);
-      onVideoStreamChange(mediaStream);
-    } else {
-      setActiveVideoStream(null);
-      onVideoStreamChange(null);
+  const changeStreams = (streamer: UseMediaStreamResult) => async () => {
+    if (screenCapture.isStreaming) {
+      screenCapture.stop();
+    } else if (webcam.isStreaming) {
+      webcam.stop();
     }
+    const stream = await streamer.start();
+    setActiveVideoStream(stream);
+    onVideoStreamChange(stream);
 
-    videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
+    return stream;
   };
 
   return (
@@ -183,17 +183,17 @@ function ControlTray({
           <>
             <MediaStreamButton
               isStreaming={screenCapture.isStreaming}
+              onIcon="stop_screen_share"
+              offIcon="screen_share"
               start={changeStreams(screenCapture)}
-              stop={changeStreams()}
-              onIcon="cancel_presentation"
-              offIcon="present_to_all"
+              stop={screenCapture.stop}
             />
             <MediaStreamButton
               isStreaming={webcam.isStreaming}
-              start={changeStreams(webcam)}
-              stop={changeStreams()}
               onIcon="videocam_off"
               offIcon="videocam"
+              start={changeStreams(webcam)}
+              stop={webcam.stop}
             />
           </>
         )}
