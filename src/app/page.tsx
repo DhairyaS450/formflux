@@ -77,6 +77,7 @@ export default function Home() {
                 <div className="main-app-area">
                   {/* AI chat interface */}
                   <Altair />
+                  <div className="counter">10</div>
                   {/* Video stream display */}
                   <video
                     className={cn("stream", {

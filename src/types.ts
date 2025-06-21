@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-// Import Google GenAI types for AI functionality
 import {
   GoogleGenAIOptions,
   LiveClientToolResponse,
@@ -23,32 +22,23 @@ import {
 } from "@google/genai";
 
 /**
- * Configuration options for the Live API client
- * Extends Google GenAI options and requires an API key for authentication
- * Used to initialize the AI streaming client
+ * the options to initiate the client, ensure apiKey is required
  */
 export type LiveClientOptions = GoogleGenAIOptions & { apiKey: string };
 
-/**
- * Log entry for streaming operations
- * Tracks various types of events during AI streaming sessions
- */
+/** log types */
 export type StreamingLog = {
-  date: Date; // Timestamp of the log entry
-  type: string; // Type of log entry (e.g., 'input', 'output', 'error')
-  count?: number; // Optional count for batch operations
-  message: // The actual log message content
-    | string // Simple string message
-    | ClientContentLog // Client-specific content log
-    | Omit<LiveServerMessage, "text" | "data"> // Server message without text/data
-    | LiveClientToolResponse; // Tool response from AI
+  date: Date;
+  type: string;
+  count?: number;
+  message:
+    | string
+    | ClientContentLog
+    | Omit<LiveServerMessage, "text" | "data">
+    | LiveClientToolResponse;
 };
 
-/**
- * Client-specific content log for tracking conversation turns
- * Used to monitor the flow of AI conversations and responses
- */
 export type ClientContentLog = {
-  turns: Part[]; // Array of conversation parts/turns
-  turnComplete: boolean; // Whether the current turn is complete
+  turns: Part[];
+  turnComplete: boolean;
 };
