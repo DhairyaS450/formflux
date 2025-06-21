@@ -209,9 +209,11 @@ function ControlTray({
         </div>
         <span className="text-indicator">Streaming</span>
       </div>
-      <button className="action-button" onClick={onStopWorkout}>
-        <span className="material-symbols-outlined">stop</span>
-      </button>
+      <div className="connection-button-container">
+        <button className="action-button stop-button" onClick={onStopWorkout}>
+          <span className="material-symbols-outlined">stop</span>
+        </button>
+      </div>
     </section>
   );
 }
