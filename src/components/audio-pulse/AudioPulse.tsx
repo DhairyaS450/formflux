@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 import "./audio-pulse.scss";
 import React from "react";
 import { useEffect, useRef } from "react";
@@ -55,7 +56,11 @@ export default function AudioPulse({ active, volume, hover }: AudioPulseProps) {
         .map((_, i) => (
           <div
             key={i}
-            ref={(el) => (lines.current[i] = el!)}
+            ref={(el) => {
+              if (el) {
+                lines.current[i] = el;
+              }
+            }}
             style={{ animationDelay: `${i * 133}ms` }}
           />
         ))}

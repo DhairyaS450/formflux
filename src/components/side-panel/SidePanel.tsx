@@ -1,6 +1,7 @@
 import { RiSidebarFoldLine, RiSidebarUnfoldLine } from "react-icons/ri";
 import { FaDiscord, FaHome, FaCalendarAlt, FaUsers, FaShareAlt, FaTicketAlt, FaCog, FaMapMarkerAlt } from "react-icons/fa";
 import "./side-panel.scss";
+import { useAuth } from "../../../src/contexts/AuthContext";
 import { useState } from "react";
 
 export default function SidePanel() {
@@ -10,13 +11,11 @@ export default function SidePanel() {
   return (
     <div className={`side-panel ${open ? "open" : ""}`}>
       <header className="top">
-        <h2>FormFlux</h2>
-        {/* Open if open is true(If clicked )*/}
+        <h2>Console</h2>
         {open ? (
           <button className="opener" onClick={() => setOpen(false)}>
             <RiSidebarFoldLine color="#b4b8bb" />
           </button>
-          /* ELSE*/
         ) : (
           <button className="opener" onClick={() => setOpen(true)}>
             <RiSidebarUnfoldLine color="#b4b8bb" />
