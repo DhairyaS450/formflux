@@ -1,6 +1,6 @@
 .side-panel {
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  width: 60px;
+  min-width: 60px;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -10,9 +10,32 @@
   color: #fff;
   position: relative;
   backdrop-filter: blur(10px);
+  overflow: visible;
+  width: 60px;
+
+  &.collapsed {
+    background: transparent;
+    border-right: none;
+    backdrop-filter: none;
+    height: min-content;
+
+    .side-panel-header {
+      background: transparent;
+      border-bottom: none;
+
+      .logo-section {
+        display: none;
+      }
+    }
+
+    .side-panel-content {
+      display: none;
+    }
+  }
 
   &.open {
     width: 280px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   }
 
   .side-panel-header {
