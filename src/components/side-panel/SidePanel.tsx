@@ -15,15 +15,12 @@ export default function SidePanel() {
       console.error("Error signing out:", error);
     }
   };
-
   return (
-    <div className={`side-panel ${open ? "open" : ""}`}>
+    <div className={`side-panel ${open ? "open" : "collapsed"}`}>
       <header className="side-panel-header">
-        {open && (
-          <div className="logo-section">
-            <img src="/logo.png" alt="FormFlux Logo" className="logo" />
-          </div>
-        )}
+        <div className="logo-section">
+          <img src="/logo.png" alt="FormFlux Logo" className="logo" />
+        </div>
         <button className="toggle-button" onClick={() => setOpen(!open)}>
           {open ? (
             <RiSidebarFoldLine />
