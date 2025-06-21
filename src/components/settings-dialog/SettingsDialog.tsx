@@ -3,7 +3,6 @@ import {
   FormEventHandler,
   useCallback,
   useMemo,
-  useState,
 } from "react";
 import "./settings-dialog.scss";
 import { useLiveAPIContext } from "../../../src/contexts/LiveAPIContext";
@@ -15,7 +14,7 @@ type FunctionDeclarationsTool = Tool & {
   functionDeclarations: FunctionDeclaration[];
 };
 
-export type SettingsDialogProps = {
+type SettingsDialogProps = {
   open: boolean;
   onClose: () => void;
 };
@@ -105,10 +104,19 @@ export default function SettingsDialog({ open, onClose }: SettingsDialogProps) {
     <div className="settings-dialog-overlay" onClick={onClose}>
       <dialog
         className="dialog"
-        open={open}
+        open
         onClick={(e) => e.stopPropagation()}
       >
         <div className={`dialog-container ${connected ? "disabled" : ""}`}>
+          <header className="dialog-header">
+            <h3>Settings</h3>
+            <button
+              className="action-button material-symbols-outlined"
+              onClick={onClose}
+            >
+              close
+            </button>
+          </header>
           {connected && (
             <div className="connected-indicator">
               <p>

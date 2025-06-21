@@ -4,7 +4,7 @@ import "./side-panel.scss";
 import { useAuth } from "../../../src/contexts/AuthContext";
 import { useState } from "react";
 
-export default function SidePanel() {
+export default function SidePanel({ onSettingsClick }: { onSettingsClick: () => void; }) {
   const [open, setOpen] = useState(true);
   const { user, logOut } = useAuth();
 
@@ -46,7 +46,7 @@ export default function SidePanel() {
             <div className="nav-section">
               <div className="section-header">Settings</div>
               <ul className="nav-list">
-                <li className="nav-item">
+                <li className="nav-item" onClick={onSettingsClick}>
                   <FaCog className="nav-icon" />
                   <span className="nav-text">Account</span>
                 </li>

@@ -222,40 +222,46 @@
       }
     }
   }
-
   // Responsive design
   @media (max-width: 768px) {
     &.open {
-      width: 260px;
+      width: 100%;
+      position: fixed;
+      z-index: 1000;
     }
 
     .side-panel-header {
-      padding: 16px 12px;
+      padding: 20px 16px;
 
       .logo {
-        height: 28px;
+        height: 32px;
       }
     }
 
     .side-panel-content {
-      padding: 16px 0;
+      padding: 20px 0;
 
       .navigation {
-        gap: 24px;
+        gap: 28px;
 
         .nav-section {
+          .section-header {
+            font-size: 0.85rem;
+            padding: 0 24px 14px;
+          }
+
           .nav-list {
             .nav-item {
-              padding: 10px 16px;
-              margin: 0 6px;
+              padding: 14px 20px;
+              margin: 0 8px;
 
               .nav-icon {
-                font-size: 1rem;
-                margin-right: 10px;
+                font-size: 1.2rem;
+                margin-right: 14px;
               }
 
               .nav-text {
-                font-size: 0.85rem;
+                font-size: 1rem;
               }
             }
           }
@@ -263,25 +269,34 @@
       }
 
       .user-section {
-        padding: 16px;
+        padding: 20px;
 
         .user-profile {
-          padding: 10px;
+          padding: 14px;
 
           .user-avatar {
-            width: 36px;
-            height: 36px;
-            margin-right: 10px;
+            width: 44px;
+            height: 44px;
+            margin-right: 14px;
           }
 
           .user-info {
             .user-name {
-              font-size: 0.85rem;
+              font-size: 1rem;
             }
 
             .user-email {
-              font-size: 0.7rem;
+              font-size: 0.8rem;
             }
+          }
+        }
+
+        .sign-out-button {
+          padding: 12px 18px;
+          font-size: 0.95rem;
+
+          svg {
+            font-size: 1.1rem;
           }
         }
       }
