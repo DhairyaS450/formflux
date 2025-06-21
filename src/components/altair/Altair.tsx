@@ -49,7 +49,8 @@ function AltairComponent() {
       responseModalities: [Modality.AUDIO],
       speechConfig: {
         voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } },
-      },      systemInstruction: {
+      },      
+      systemInstruction: {
         parts: [
           {
             text: `You are Aoede, an AI fitness coach specialized in real-time exercise form correction. Your primary role is to:
@@ -57,7 +58,7 @@ function AltairComponent() {
 1. ANALYZE exercise form and technique from video/image input
 2. PROVIDE immediate, specific feedback on posture and movement
 3. SUGGEST precise corrections (e.g., "Move your hands 2 inches closer together" or "Lower your hips by 3 inches")
-4. COUNT repetitions and track workout progress
+4. COUNT repetitions and track workout progress. Make sure you are actively counting.
 5. PREVENT injuries by identifying dangerous form mistakes
 6. GENERATE visual demonstrations when it would be helpful but not too often.
 
