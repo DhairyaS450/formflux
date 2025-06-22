@@ -269,67 +269,39 @@ function ControlTray({
     <section className="control-tray">
       <canvas ref={renderCanvasRef} className="render-canvas" />
       
-      {/* Action buttons navigation */}
-      <nav className={cn("actions-nav", { disabled: !connected })}>
-        {/* Microphone toggle button */}
-        <button
-          className={cn("action-button mic-button")}
-          onClick={() => setMuted(!muted)}
-        >
-          {!muted ? (
-            <span className="material-symbols-outlined">mic</span>
-          ) : (
-            <span className="material-symbols-outlined">mic_off</span>
-          )}
-        </button>
+      {/* Action buttons are now direct children of the flex container */}
+      <button
+        className={cn("action-button mic-button", { disabled: !connected })}
+        onClick={() => setMuted(!muted)}
+        disabled={!connected}
+      >
+        <span className="material-symbols-outlined">{!muted ? "mic" : "mic_off"}</span>
+      </button>
 
-        {/* Video camera button - only shown if video is supported */}
-        {supportsVideo && (
-          <>
-            <MediaStreamButton
-              isStreaming={webcam.isStreaming}
-              onIcon="videocam_off"
-              offIcon="videocam"
-              start={changeStreams(webcam)}
-              stop={webcam.stop}
-            />
-          </>
-        )}
-        
-        {/* Additional child components */}
-        {children}
-      </nav>
+      {supportsVideo && (
+        <MediaStreamButton
+          isStreaming={webcam.isStreaming}
+          onIcon="videocam_off"
+          offIcon="videocam"
+          start={changeStreams(webcam)}
+          stop={webcam.stop}
+        />
+      )}
+      
+      {children}
+      
+      {/* Connect/disconnect button */}
+      <button
+        ref={connectButtonRef}
+        className={cn("action-button connect-toggle", { connected })}
+        onClick={connected ? disconnect : connect}
+      >
+        <span className="material-symbols-outlined">{connected ? "pause" : "play_arrow"}</span>
+      </button>
 
-      {/* Connection status and control */}
-      <div className={cn("connection-container", { connected })}>
-        <div className="connection-button-container">
-          <AudioPulse active={connected} volume={volume} />
-          {/* Connect/disconnect button */}
-          <button
-            ref={connectButtonRef}
-            className={cn("action-button connect-toggle", { connected })}
-            onClick={() => {
-              console.log(`ControlTray: Connect/Disconnect button clicked. Currently connected: ${connected}`);
-              if (connected) {
-                disconnect();
-              } else {
-                connect();
-              }
-            }}
-          >
-            <span className="material-symbols-outlined">
-              {connected ? "pause" : "play_arrow"}
-            </span>
-          </button>
-        </div>
-        {/* Connection status text */}
-        <span className="text-indicator">Streaming</span>
-      </div>
-      <div className="connection-button-container">
-        <button className="action-button stop-button" onClick={onStopWorkout}>
-          <span className="material-symbols-outlined">stop</span>
-        </button>
-      </div>
+      <button className="action-button stop-button" onClick={onStopWorkout}>
+        <span className="material-symbols-outlined">stop</span>
+      </button>
     </section>
   );
 }
