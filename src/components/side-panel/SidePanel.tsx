@@ -7,13 +7,20 @@ import "./side-panel.scss";
 import { useAuth } from "../../../src/contexts/AuthContext";
 // Import React hooks
 import { useState } from "react";
+import cn from "classnames";
 
 // Props interface for the SidePanel component
 interface SidePanelProps {
   onSettingsClick: () => void; // Callback function to open settings dialog
+  onHomeClick: () => void;
+  currentView: "dashboard" | "settings";
 }
 
-export default function SidePanel({ onSettingsClick }: SidePanelProps) {
+export default function SidePanel({
+  onSettingsClick,
+  onHomeClick,
+  currentView,
+}: SidePanelProps) {
   // State to control whether the side panel is expanded or collapsed
   const [open, setOpen] = useState(true);
   
@@ -62,7 +69,12 @@ export default function SidePanel({ onSettingsClick }: SidePanelProps) {
               <div className="section-header">Main</div>
               <ul className="nav-list">
                 {/* Home navigation item - currently active */}
-                <li className="nav-item active">
+                <li
+                  className={cn("nav-item", {
+                    active: currentView === "dashboard",
+                  })}
+                  onClick={onHomeClick}
+                >
                   <FaHome className="nav-icon" />
                   <span className="nav-text">Home</span>
                 </li>
@@ -74,7 +86,12 @@ export default function SidePanel({ onSettingsClick }: SidePanelProps) {
               <div className="section-header">Settings</div>
               <ul className="nav-list">
                 {/* Account settings item - opens settings dialog */}
-                <li className="nav-item" onClick={onSettingsClick}>
+                <li
+                  className={cn("nav-item", {
+                    active: currentView === "settings",
+                  })}
+                  onClick={onSettingsClick}
+                >
                   <FaCog className="nav-icon" />
                   <span className="nav-text">Account</span>
                 </li>

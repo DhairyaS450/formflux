@@ -15,7 +15,7 @@ import { LiveClientOptions } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import LandingPage from "@/components/landing-page/LandingPage";
 import WorkoutDashboard from "@/components/workout-dashboard/WorkoutDashboard";
-import SettingsDialog from "@/components/settings-dialog/SettingsDialog";
+import SettingsPage from "@/components/settings-page/SettingsPage";
 
 // Environment variable for Gemini API key
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY as string;
@@ -31,7 +31,7 @@ const apiOptions: LiveClientOptions = {
 export default function Home() {
   console.log("Home page rendered");
   // Authentication state and functions
-  const { user, googleSignIn } = useAuth();
+  const { user, googleSignIn, handleSignOut } = useAuth();
   // Reference to video element for webcam/screen capture display
   const videoRef = useRef<HTMLVideoElement>(null);
   // Current video stream state
@@ -39,7 +39,9 @@ export default function Home() {
   // Whether a workout session is currently active
   const [workoutStarted, setWorkoutStarted] = useState(false);
   // Settings dialog visibility state
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<"dashboard" | "settings">(
+    "dashboard"
+  );
   const [repCount, setRepCount] = useState(0);
 
   // Handle Google authentication
@@ -79,48 +81,50 @@ export default function Home() {
         <LiveAPIProvider options={apiOptions}>
           <div className="streaming-console">
             {/* Side navigation panel */}
-            <SidePanel onSettingsClick={() => setSettingsOpen(true)} />
-            
-            {/* Conditional rendering based on workout state */}
-            {workoutStarted ? (
-              // Active workout interface
-              <main>
-                <div className="main-app-area">
-                  <div className="counter">{repCount}</div>
-                  {/* AI chat interface */}
-                  <Altair onRepCount={handleRepCount} />
-                  {/* Video stream display */}
-                  <video
-                    className={cn("stream", {
-                      hidden: !videoRef.current || !videoStream,
-                    })}
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                  />
-                </div>
+            <SidePanel
+              currentView={currentView}
+              onHomeClick={() => setCurrentView("dashboard")}
+              onSettingsClick={() => setCurrentView("settings")}
+            />
 
-                {/* Control panel for media and connection */}
-                <ControlTray
-                  videoRef={videoRef}
-                  supportsVideo={true}
-                  onVideoStreamChange={setVideoStream}
-                  onStopWorkout={handleStopWorkout}
-                />
-              </main>
+            {/* Conditional rendering based on workout state */}
+            {currentView === "dashboard" ? (
+              workoutStarted ? (
+                // Active workout interface
+                <main>
+                  <div className="main-app-area">
+                    <div className="counter">{repCount}</div>
+                    {/* AI chat interface */}
+                    <Altair onRepCount={handleRepCount} />
+                    {/* Video stream display */}
+                    <video
+                      className={cn("stream", {
+                        hidden: !videoRef.current || !videoStream,
+                      })}
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                    />
+                  </div>
+
+                  {/* Control panel for media and connection */}
+                  <ControlTray
+                    videoRef={videoRef}
+                    supportsVideo={true}
+                    onVideoStreamChange={setVideoStream}
+                    onStopWorkout={handleStopWorkout}
+                  />
+                </main>
+              ) : (
+                // Dashboard interface
+                <main>
+                  <WorkoutDashboard onStartWorkout={handleStartWorkout} />
+                </main>
+              )
             ) : (
-              // Dashboard interface
-              <main>
-                <WorkoutDashboard onStartWorkout={handleStartWorkout} />
-              </main>
+              <SettingsPage />
             )}
           </div>
-          
-          {/* Settings dialog */}
-          <SettingsDialog
-            open={settingsOpen}
-            onClose={() => setSettingsOpen(false)}
-          />
         </LiveAPIProvider>
       ) : (
         // Landing page for unauthenticated users
