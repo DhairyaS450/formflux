@@ -16,6 +16,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import LandingPage from "@/components/landing-page/LandingPage";
 import WorkoutDashboard from "@/components/workout-dashboard/WorkoutDashboard";
 import SettingsPage from "@/components/settings-page/SettingsPage";
+import PoseOverlay from "@/components/pose-overlay/PoseOverlay";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 
 // Environment variable for Gemini API key
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY as string;
@@ -43,6 +45,9 @@ export default function Home() {
     "dashboard"
   );
   const [repCount, setRepCount] = useState(0);
+  const [landmarks, setLandmarks] = useState<NormalizedLandmark[] | null>(
+    null
+  );
 
   // Handle Google authentication
   const handleSignIn = async () => {
@@ -128,6 +133,10 @@ export default function Home() {
                         display: "block",
                       }}
                     />
+                    <PoseOverlay
+                      landmarks={landmarks}
+                      videoRef={videoRef as React.RefObject<HTMLVideoElement>}
+                    />
                     {/* Rep counter */}
                     <div
                       className="counter"
@@ -164,6 +173,7 @@ export default function Home() {
                         supportsVideo={true}
                         onVideoStreamChange={setVideoStream}
                         onStopWorkout={handleStopWorkout}
+                        onLandmarks={setLandmarks}
                       />
                     </div>
                     {/* AI chat interface */}

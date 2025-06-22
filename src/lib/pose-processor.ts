@@ -51,7 +51,7 @@ export async function createLlmInference(): Promise<LlmInference> {
   llmInference = await LlmInference.createFromOptions(genai, {
     baseOptions: {
       modelAssetPath:
-        "https://d7x39115-8000.use.devtunnels.ms/gemma-2b-it-gpu-int8.bin",
+        "https://storage.googleapis.com/mediapipe-models/llm_inference/gemma-2b-it-gpu-int4/1/gemma-2b-it-gpu-int4.bin",
     },
   });
   return llmInference;
@@ -66,7 +66,7 @@ export async function createPoseLandmarker(): Promise<PoseLandmarker> {
   }
   console.log("Creating new PoseLandmarker instance");
   const vision = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
   );
   poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
     baseOptions: {

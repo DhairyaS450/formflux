@@ -94,7 +94,7 @@ export default function SidePanel({
                   onClick={onSettingsClick}
                 >
                   <FaCog className="nav-icon" />
-                  <span className="nav-text">Account</span>
+                  <span className="nav-text">Settings</span>
                 </li>
               </ul>
             </div>

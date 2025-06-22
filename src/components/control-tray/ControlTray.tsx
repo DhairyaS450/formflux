@@ -44,7 +44,7 @@ import {
   getPoseAngles,
   getPoseDescription,
 } from "@/lib/pose-processor";
-import { PoseLandmarker } from "@mediapipe/tasks-vision";
+import { NormalizedLandmark, PoseLandmarker } from "@mediapipe/tasks-vision";
 import { LlmInference } from "@mediapipe/tasks-genai";
 
 // Props interface for the ControlTray component
@@ -54,6 +54,7 @@ export type ControlTrayProps = {
   supportsVideo: boolean; // Whether video features are supported
   onVideoStreamChange?: (stream: MediaStream | null) => void; // Callback for video stream changes
   onStopWorkout: () => void; // Callback to stop workout session
+  onLandmarks: (landmarks: NormalizedLandmark[] | null) => void;
 };
 
 // Props interface for media stream buttons (webcam/screen capture)
@@ -90,6 +91,7 @@ function ControlTray({
   onVideoStreamChange = () => {},
   supportsVideo,
   onStopWorkout,
+  onLandmarks,
 }: ControlTrayProps) {
   console.log("ControlTray rendered");
   // State to track the currently active video stream
@@ -115,8 +117,7 @@ function ControlTray({
   const connectButtonRef = useRef<HTMLButtonElement>(null);
 
   // Get Live API context for AI streaming
-  const { client, connected, connect, disconnect, volume } =
-    useLiveAPIContext();
+  const { client, connected, connect, disconnect } = useLiveAPIContext();
 
   /**
    * Function to change video streams (webcam/screen capture)
@@ -226,6 +227,7 @@ function ControlTray({
       if (connected && landmarker && llm && video && video.readyState >= 2) {
         const now = performance.now();
         const poseResults = landmarker.detectForVideo(video, now);
+        onLandmarks(poseResults.landmarks[0] || null);
         const nowMs = Date.now();
 
         // Throttle pose data sending to 1 FPS (every 1000ms)
@@ -259,9 +261,17 @@ function ControlTray({
       if (animationFrameId.current) {
         console.log("ControlTray: Cleaning up video processing loop");
         cancelAnimationFrame(animationFrameId.current);
+        onLandmarks(null);
       }
     };
-  }, [connected, activeVideoStream, client, videoRef]);
+  }, [
+    connected,
+    activeVideoStream,
+    client,
+    videoRef,
+    onLandmarks,
+    llmInferenceRef,
+  ]);
 
   return (
     <section className="control-tray">
