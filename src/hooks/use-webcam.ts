@@ -23,14 +23,17 @@ export function useWebcam(): UseMediaStreamResult {
 
   useEffect(() => {
     const handleStreamEnded = () => {
+      console.log("useWebcam: stream ended event fired");
       setIsStreaming(false);
       setStream(null);
     };
     if (stream) {
+      console.log("useWebcam: Adding 'ended' listener to tracks");
       stream
         .getTracks()
         .forEach((track) => track.addEventListener("ended", handleStreamEnded));
       return () => {
+        console.log("useWebcam: Removing 'ended' listener from tracks");
         stream
           .getTracks()
           .forEach((track) =>
@@ -41,16 +44,20 @@ export function useWebcam(): UseMediaStreamResult {
   }, [stream]);
 
   const start = async () => {
+    console.log("useWebcam: start called");
     const mediaStream = await navigator.mediaDevices.getUserMedia({
       video: true,
     });
+    console.log("useWebcam: getUserMedia successful");
     setStream(mediaStream);
     setIsStreaming(true);
     return mediaStream;
   };
 
   const stop = () => {
+    console.log("useWebcam: stop called");
     if (stream) {
+      console.log("useWebcam: Stopping all tracks");
       stream.getTracks().forEach((track) => track.stop());
       setStream(null);
       setIsStreaming(false);

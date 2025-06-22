@@ -35,7 +35,11 @@ export type UseLiveAPIResults = {
 };
 
 export function useLiveAPI(options: LiveClientOptions): UseLiveAPIResults {
-  const client = useMemo(() => new GenAILiveClient(options), [options]);
+  console.log("useLiveAPI hook initialized");
+  const client = useMemo(() => {
+    console.log("useLiveAPI: Creating new GenAILiveClient");
+    return new GenAILiveClient(options);
+  }, [options]);
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
 
   const [model, setModel] = useState<string>("models/gemini-2.5-flash-preview-native-audio-dialog");
@@ -45,14 +49,18 @@ export function useLiveAPI(options: LiveClientOptions): UseLiveAPIResults {
 
   // register audio for streaming server -> speakers
   useEffect(() => {
+    console.log("useLiveAPI: Audio streamer setup effect running");
     if (!audioStreamerRef.current) {
+      console.log("useLiveAPI: Initializing audio streamer");
       audioContext({ id: "audio-out" }).then((audioCtx: AudioContext) => {
+        console.log("useLiveAPI: AudioContext obtained, creating AudioStreamer");
         audioStreamerRef.current = new AudioStreamer(audioCtx);
         audioStreamerRef.current
           .addWorklet("vumeter-out", VolMeterWorket, (ev: MessageEvent) => {
             setVolume(ev.data.volume);
           })
           .then(() => {
+            console.log("useLiveAPI: Audio worklet added successfully");
             // Successfully added worklet
           });
       });
@@ -60,19 +68,25 @@ export function useLiveAPI(options: LiveClientOptions): UseLiveAPIResults {
   }, [audioStreamerRef]);
 
   useEffect(() => {
+    console.log("useLiveAPI: Registering client event listeners");
     const onOpen = () => {
+      console.log("useLiveAPI: 'open' event received, setting connected to true");
       setConnected(true);
     };
 
-    const onClose = () => {
+    const onClose = (event: CloseEvent) => {
+      console.log("useLiveAPI: 'close' event received, setting connected to false. Reason:", event.reason, "Code:", event.code);
       setConnected(false);
     };
 
     const onError = (error: ErrorEvent) => {
-      console.error("error", error);
+      console.error("useLiveAPI: 'error' event received", error);
     };
 
-    const stopAudioStreamer = () => audioStreamerRef.current?.stop();
+    const stopAudioStreamer = () => {
+      console.log("useLiveAPI: 'interrupted' event received, stopping audio streamer");
+      audioStreamerRef.current?.stop();
+    };
 
     const onAudio = (data: ArrayBuffer) =>
       audioStreamerRef.current?.addPCM16(new Uint8Array(data));
@@ -85,6 +99,7 @@ export function useLiveAPI(options: LiveClientOptions): UseLiveAPIResults {
       .on("audio", onAudio);
 
     return () => {
+      console.log("useLiveAPI: Cleaning up client event listeners and disconnecting");
       client
         .off("error", onError)
         .off("open", onOpen)
@@ -96,14 +111,20 @@ export function useLiveAPI(options: LiveClientOptions): UseLiveAPIResults {
   }, [client]);
 
   const connect = useCallback(async () => {
+    console.log("useLiveAPI: connect function called");
     if (!config) {
+      console.error("useLiveAPI: connect called but config is not set");
       throw new Error("config has not been set");
     }
+    console.log("useLiveAPI: Disconnecting before reconnecting");
     client.disconnect();
+    console.log("useLiveAPI: Connecting with model:", model, "and config:", config);
     await client.connect(model, config);
+    console.log("useLiveAPI: client.connect promise resolved");
   }, [client, config, model]);
 
   const disconnect = useCallback(async () => {
+    console.log("useLiveAPI: disconnect function called");
     client.disconnect();
     setConnected(false);
   }, [setConnected, client]);

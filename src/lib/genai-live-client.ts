@@ -110,10 +110,13 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
       message,
     };
     this.emit("log", log);
+    console.log(`[GenAILiveClient] ${type}`, message);
   }
 
   async connect(model: string, config: LiveConnectConfig): Promise<boolean> {
+    this.log("client.connect", `Attempting to connect...`);
     if (this._status === "connected" || this._status === "connecting") {
+      this.log("client.connect", `Already connected or connecting. Aborting.`);
       return false;
     }
 
@@ -136,18 +139,22 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
       });
     } catch (e) {
       console.error("Error connecting to GenAI Live:", e);
+      this.log("client.connect.error", e);
       this._status = "disconnected";
       return false;
     }
 
     this._status = "connected";
+    this.log("client.connect", `Connection successful.`);
     return true;
   }
 
   public disconnect() {
     if (!this.session) {
+      this.log("client.disconnect", `Already disconnected.`);
       return false;
     }
+    this.log("client.disconnect", `Closing session.`);
     this.session?.close();
     this._session = null;
     this._status = "disconnected";
@@ -169,7 +176,7 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
   protected onclose(e: CloseEvent) {
     this.log(
       `server.close`,
-      `disconnected ${e.reason ? `with reason: ${e.reason}` : ``}`
+      `disconnected ${e.reason ? `with reason: ${e.reason} (code: ${e.code})` : `(code: ${e.code})`}`
     );
     this.emit("close", e);
   }
