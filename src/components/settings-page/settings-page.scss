@@ -111,7 +111,7 @@
 
 .voice-selector-container, .response-modality-selector-container {
   width: 100%;
-  max-width: 320px; // Set a max-width to make the container smaller
+  max-width: 280px; // Set a max-width to make the container smaller
   margin: 0 auto; // Center the container
 
   .selector-title {
@@ -136,10 +136,11 @@
     display: flex;
     flex-direction: row; // Align items horizontally
     align-items: center;
-    justify-content: flex-start; // Align content to the left
+    justify-content: center; // Align content to the center
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 1rem;
 
     &:hover {
       transform: translateY(-2px);
@@ -158,13 +159,12 @@
   }
 
   .option-icon {
-    width: 28px; // Smaller icon size
-    height: 28px; // Smaller icon size
-    margin-right: 0.75rem; // Adjust space between icon and label
+    width: 32px; // Smaller icon size
+    height: 32px; // Smaller icon size
   }
 
   .option-label {
-    font-size: 0.9rem; // Smaller font size for the label
+    font-size: 1rem; // Smaller font size for the label
     color: var(--Neutral-90);
   }
 }
