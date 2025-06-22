@@ -38,6 +38,11 @@ import { AudioRecorder } from "@/lib/audio-recorder";
 // UI Components
 import AudioPulse from "@/components/audio-pulse/AudioPulse";
 import "./control-tray.scss";
+import {
+  createPoseLandmarker,
+  getPoseAngles,
+} from "@/lib/pose-processor";
+import { PoseLandmarker } from "@mediapipe/tasks-vision";
 
 // Props interface for the ControlTray component
 export type ControlTrayProps = {
@@ -83,6 +88,7 @@ function ControlTray({
   supportsVideo,
   onStopWorkout,
 }: ControlTrayProps) {
+  console.log("ControlTray rendered");
   // State to track the currently active video stream
   const [activeVideoStream, setActiveVideoStream] =
     useState<MediaStream | null>(null);
@@ -115,9 +121,12 @@ function ControlTray({
    */
   const changeStreams = useCallback(
     (streamer: UseMediaStreamResult) => async () => {
+      console.log("ControlTray: changeStreams called for", streamer.type);
       if (webcam.isStreaming) {
+        console.log("ControlTray: Stopping existing webcam stream");
         webcam.stop();
       }
+      console.log("ControlTray: Starting new stream");
       const stream = await streamer.start();
       setActiveVideoStream(stream);
       onVideoStreamChange(stream);
@@ -129,7 +138,9 @@ function ControlTray({
 
   // Auto-start webcam when component mounts
   useEffect(() => {
+    console.log("ControlTray: Auto-start webcam effect running");
     if (webcam && !webcam.isStreaming) {
+      console.log("ControlTray: Webcam not streaming, calling changeStreams");
       changeStreams(webcam)();
     }
   }, [webcam, changeStreams]);
@@ -144,6 +155,7 @@ function ControlTray({
 
   // Handle audio recording and streaming to AI
   useEffect(() => {
+    console.log("ControlTray: Audio recording effect running. Connected:", connected, "Muted:", muted);
     const onData = (base64: string) => {
       // Send audio data to AI client
       client.sendRealtimeInput([
@@ -156,74 +168,106 @@ function ControlTray({
     
     // Start recording if connected and not muted
     if (connected && !muted && audioRecorder) {
+      console.log("ControlTray: Starting audio recorder");
       audioRecorder.on("data", onData).on("volume", setInVolume).start();
     } else {
+      console.log("ControlTray: Stopping audio recorder");
       audioRecorder.stop();
     }
     
     // Cleanup event listeners
     return () => {
+      console.log("ControlTray: Cleaning up audio recorder listeners");
       audioRecorder.off("data", onData).off("volume", setInVolume);
     };
   }, [connected, client, muted, audioRecorder]);
 
+  // --- MODIFIED: MediaPipe and Video Processing Logic ---
+  const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
+  const lastImageSendTimeRef = useRef<number>(0);
+  const lastPoseSendTimeRef = useRef<number>(0);
+  const animationFrameId = useRef<number | null>(null);
+
+  // Initialize MediaPipe PoseLandmarker
+  useEffect(() => {
+    console.log("ControlTray: Initializing MediaPipe PoseLandmarker");
+    async function initializeMediaPipe() {
+      poseLandmarkerRef.current = await createPoseLandmarker();
+      console.log("ControlTray: MediaPipe PoseLandmarker initialized");
+    }
+    initializeMediaPipe();
+  }, []);
+
   // Handle video streaming to AI
   useEffect(() => {
-    // Set video element source
+    console.log("ControlTray: Video processing effect running. Connected:", connected, "ActiveVideoStream:", !!activeVideoStream);
     if (videoRef.current) {
       videoRef.current.srcObject = activeVideoStream;
     }
 
-    let timeoutId = -1;
-
-    /**
-     * Function to capture and send video frames to AI
-     * Processes video at 0.5 FPS to reduce bandwidth
-     */
-    function sendVideoFrame() {
+    const processVideo = async () => {
       const video = videoRef.current;
       const canvas = renderCanvasRef.current;
+      const landmarker = poseLandmarkerRef.current;
 
-      if (!video || !canvas) {
-        return;
+      if (connected && landmarker && video && video.readyState >= 2) {
+        const now = performance.now();
+        const poseResults = landmarker.detectForVideo(video, now);
+        const nowMs = Date.now();
+
+        // Throttle pose data sending to ~3 FPS (every 333ms)
+        if (nowMs - lastPoseSendTimeRef.current > 333) {
+          // Send pose landmark data
+          if (poseResults.landmarks && poseResults.landmarks.length > 0) {
+            const angles = getPoseAngles(poseResults.landmarks[0]);
+            client.send([{ text: JSON.stringify(angles) }], false);
+            lastPoseSendTimeRef.current = nowMs;
+          }
+        }
+
+        // Send a full image frame every 2 seconds for context
+        if (nowMs - lastImageSendTimeRef.current > 2000 && canvas) {
+          console.log("ControlTray: Sending image frame");
+          const ctx = canvas.getContext("2d")!;
+          canvas.width = video.videoWidth * 0.25;
+          canvas.height = video.videoHeight * 0.25;
+          if (canvas.width + canvas.height > 0) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const base64 = canvas.toDataURL("image/jpeg", 0.8);
+            const data = base64.slice(base64.indexOf(",") + 1, Infinity);
+            client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
+            lastImageSendTimeRef.current = nowMs;
+          }
+        }
       }
 
-      // Get canvas context and set dimensions (25% of video size for performance)
-      const ctx = canvas.getContext("2d")!;
-      canvas.width = video.videoWidth * 0.25;
-      canvas.height = video.videoHeight * 0.25;
-      
-      // Draw video frame to canvas and convert to base64
-      if (canvas.width + canvas.height > 0) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const base64 = canvas.toDataURL("image/jpeg", 1.0);
-        const data = base64.slice(base64.indexOf(",") + 1, Infinity);
-        
-        // Send video frame to AI client
-        client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
-      }
-      
-      // Schedule next frame capture
-      if (connected) {
-        timeoutId = window.setTimeout(sendVideoFrame, 1000 / 0.5);
+      animationFrameId.current = requestAnimationFrame(processVideo);
+    };
+
+    if (connected && activeVideoStream) {
+      console.log("ControlTray: Starting video processing loop");
+      // Reset image timer on connect
+      lastImageSendTimeRef.current = 0;
+      lastPoseSendTimeRef.current = 0;
+      animationFrameId.current = requestAnimationFrame(processVideo);
+    } else {
+      if (animationFrameId.current) {
+        console.log("ControlTray: Stopping video processing loop");
+        cancelAnimationFrame(animationFrameId.current);
       }
     }
-    
-    // Start video frame capture if connected and video stream exists
-    if (connected && activeVideoStream !== null) {
-      requestAnimationFrame(sendVideoFrame);
-    }
-    
-    // Cleanup timeout on unmount
+
     return () => {
-      clearTimeout(timeoutId);
+      if (animationFrameId.current) {
+        console.log("ControlTray: Cleaning up video processing loop");
+        cancelAnimationFrame(animationFrameId.current);
+      }
     };
   }, [connected, activeVideoStream, client, videoRef]);
 
   return (
     <section className="control-tray">
-      {/* Hidden canvas for video frame processing */}
-      <canvas style={{ display: "none" }} ref={renderCanvasRef} />
+      <canvas ref={renderCanvasRef} className="render-canvas" />
       
       {/* Action buttons navigation */}
       <nav className={cn("actions-nav", { disabled: !connected })}>
@@ -233,9 +277,9 @@ function ControlTray({
           onClick={() => setMuted(!muted)}
         >
           {!muted ? (
-            <span className="material-symbols-outlined filled">mic</span>
+            <span className="material-symbols-outlined">mic</span>
           ) : (
-            <span className="material-symbols-outlined filled">mic_off</span>
+            <span className="material-symbols-outlined">mic_off</span>
           )}
         </button>
 
@@ -259,13 +303,21 @@ function ControlTray({
       {/* Connection status and control */}
       <div className={cn("connection-container", { connected })}>
         <div className="connection-button-container">
+          <AudioPulse active={connected} volume={volume} />
           {/* Connect/disconnect button */}
           <button
             ref={connectButtonRef}
             className={cn("action-button connect-toggle", { connected })}
-            onClick={connected ? disconnect : connect}
+            onClick={() => {
+              console.log(`ControlTray: Connect/Disconnect button clicked. Currently connected: ${connected}`);
+              if (connected) {
+                disconnect();
+              } else {
+                connect();
+              }
+            }}
           >
-            <span className="material-symbols-outlined filled">
+            <span className="material-symbols-outlined">
               {connected ? "pause" : "play_arrow"}
             </span>
           </button>

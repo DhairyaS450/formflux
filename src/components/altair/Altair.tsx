@@ -23,8 +23,6 @@ import {
   Type,
 } from "@google/genai";
 
-
-
 const repCountDeclaration: FunctionDeclaration = {
   name: "count_rep",
   description: "Increments the rep counter by one.",
@@ -35,51 +33,52 @@ const repCountDeclaration: FunctionDeclaration = {
 };
 
 function AltairComponent({ onRepCount }: { onRepCount: () => void }) {
+  console.log("AltairComponent rendered");
   const [jsonString, setJSONString] = useState<string>("");
   const { client, setConfig, setModel } = useLiveAPIContext();
 
   useEffect(() => {
+    console.log("AltairComponent: useEffect for setting model and config running");
     setModel("models/gemini-2.5-flash-preview-native-audio-dialog");
     setConfig({
       responseModalities: [Modality.AUDIO],
       speechConfig: {
-        voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } },
+        voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } },
       },      
-      // proactivity: {
-      //   proactiveAudio: true
-      // },
       systemInstruction: {
         parts: [
           {
-            text: `You are an AI fitness coach specialized in real-time exercise form correction. Your primary role is to:
+            text: `You are an AI fitness coach specialized in real-time exercise form correction. Your primary role is to analyze a JSON stream of pose data and provide feedback.
 
-1. ANALYZE exercise form and technique from video/image input
-2. PROVIDE immediate, specific feedback on posture and movement
-3. SUGGEST precise corrections (e.g., "Move your hands 2 inches closer together" or "Lower your hips by 3 inches")
-4. COUNT repetitions and track workout progress. Make sure you are actively counting and using the count_rep function for each rep. 
-5. PREVENT injuries by identifying dangerous form mistakes
+You will receive a continuous stream of JSON objects containing key body angles, like this:
+{ "leftElbow": 170, "rightElbow": 165, "leftKnee": 95, ... }
 
-For exercises like push-ups, squats, deadlifts, etc., focus on:
-- Joint alignment and positioning
-- Range of motion
-- Tempo and breathing
-- Common form mistakes
-- Safety considerations
+1. ANALYZE these angles to understand the user's exercise form.
+2. PROVIDE immediate, specific, and concise verbal feedback on their posture and movement.
+3. SUGGEST precise corrections (e.g., "Lower your hips," or "Straighten your left arm.").
+4. PREVENT injuries by identifying dangerous form mistakes based on the angle data.
+5. COUNT reps always, unless the form was horrible. Use count_rep function call.
 
-Always be encouraging while being precise about corrections. Use clear, actionable language. Be very natural and concise.`,
+Occasionally, you will receive an image for visual context, but your primary analysis should be on the JSON angle data.
+If the user's camera or mic is not working, say so directly.
+Always be encouraging while being precise. Use clear, actionable language. Be very natural and concise.
+
+When it looks like the user is giving up, give them motivation.`,
           },
         ],
       },
       tools: [
         // there is a free-tier quota for search
-        { googleSearch: {} },
+        // { googleSearch: {} },
         { functionDeclarations: [repCountDeclaration] },
       ],
     });
   }, [setConfig, setModel]);
 
   useEffect(() => {
+    console.log("AltairComponent: useEffect for toolcall listener running");
     const onToolCall = (toolCall: LiveServerToolCall) => {
+      console.log("AltairComponent: 'toolcall' event received", toolCall);
       if (!toolCall.functionCalls) {
         return;
       }
@@ -88,40 +87,44 @@ Always be encouraging while being precise about corrections. Use clear, actionab
         (fc) => fc.name === repCountDeclaration.name
       );
       if (repFc) {
+        console.log("AltairComponent: rep_count function call found. Calling onRepCount.");
         onRepCount();
       }
 
       // send data for the response of your tool call
       // in this case Im just saying it was successful
       if (toolCall.functionCalls.length) {
+        console.log("AltairComponent: Sending tool response for", toolCall.functionCalls.length, "function calls.");
         setTimeout(
-          () =>
+          () => {
+            console.log("AltairComponent: setTimeout callback fired. Sending tool response now.");
             client.sendToolResponse({
               functionResponses: toolCall.functionCalls?.map((fc) => ({
                 response: { output: { success: true } },
                 id: fc.id,
                 name: fc.name,
               })),
-            }),
-          200
+            });
+          },
+          50
         );
       }
     };
     client.on("toolcall", onToolCall);
     return () => {
+      console.log("AltairComponent: Cleaning up toolcall listener");
       client.off("toolcall", onToolCall);
     };
   }, [client, onRepCount]);
 
-  const embedRef = useRef<HTMLDivElement>(null);
-
+  const altairContainer = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (embedRef.current && jsonString) {
-      console.log("jsonString", jsonString);
-      vegaEmbed(embedRef.current, JSON.parse(jsonString));
+    if (altairContainer.current && jsonString) {
+      console.log("AltairComponent: vegaEmbed with jsonString", jsonString);
+      vegaEmbed(altairContainer.current, JSON.parse(jsonString));
     }
-  }, [embedRef, jsonString]);
-  return <div className="vega-embed" ref={embedRef} />;
+  }, [altairContainer, jsonString]);
+  return <div className="vega-embed" ref={altairContainer} />;
 }
 
 export const Altair = memo(AltairComponent);

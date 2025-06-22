@@ -119,17 +119,21 @@
   }
 }
 
-/* Main control tray container */
+.render-canvas {
+  display: none;
+}
+
+/* Control tray container */
 .control-tray {
-  position: absolute; // Absolute positioning
-  bottom: 0; // Bottom of screen
-  left: 50%; // Center horizontally
-  transform: translate(-50%, 0); // Center alignment
-  display: inline-flex;
+  position: relative;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
   gap: 8px; // Space between elements
-  padding-bottom: 18px; // Bottom padding
+  padding: 10px;
+  border-radius: 27px;
+  background: var(--Neutral-5);
+  border: 1px solid var(--Neutral-30);
 
   /* Disabled state styling */
   .disabled .action-button,

@@ -27,8 +27,9 @@ if (typeof API_KEY !== "string") {
 const apiOptions: LiveClientOptions = {
   apiKey: API_KEY,
 };
-
+// Home page component
 export default function Home() {
+  console.log("Home page rendered");
   // Authentication state and functions
   const { user, googleSignIn } = useAuth();
   // Reference to video element for webcam/screen capture display
@@ -43,6 +44,7 @@ export default function Home() {
 
   // Handle Google authentication
   const handleSignIn = async () => {
+    console.log("handleSignIn called");
     try {
       await googleSignIn();
     } catch (error) {
@@ -52,17 +54,20 @@ export default function Home() {
 
   // Start workout session - transition to workout interface
   const handleStartWorkout = () => {
+    console.log("handleStartWorkout called");
     setWorkoutStarted(true);
     setRepCount(0);
   };
 
   // Stop workout session - return to dashboard
   const handleStopWorkout = () => {
+    console.log("handleStopWorkout called");
     setWorkoutStarted(false);
     setVideoStream(null);
   };
 
   const handleRepCount = () => {
+    console.log("handleRepCount called");
     setRepCount((reps) => reps + 1);
   };
 

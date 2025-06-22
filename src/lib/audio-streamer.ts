@@ -26,7 +26,7 @@ export class AudioStreamer {
   private isStreamComplete: boolean = false;
   private checkInterval: number | null = null;
   private scheduledTime: number = 0;
-  private initialBufferTime: number = 0.1; //0.1 // 100ms initial buffer
+  private initialBufferTime: number = 0.05; // 50ms initial buffer
   // Web Audio API nodes. source => gain => destination
   public gainNode: GainNode;
   public source: AudioBufferSourceNode;
