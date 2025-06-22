@@ -27,7 +27,7 @@ if (typeof API_KEY !== "string") {
 const apiOptions: LiveClientOptions = {
   apiKey: API_KEY,
 };
-
+// Home page component
 export default function Home() {
   console.log("Home page rendered");
   // Authentication state and functions
