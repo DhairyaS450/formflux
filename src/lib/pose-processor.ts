@@ -51,7 +51,7 @@ export async function createLlmInference(): Promise<LlmInference> {
   llmInference = await LlmInference.createFromOptions(genai, {
     baseOptions: {
       modelAssetPath:
-        "https://storage.googleapis.com/mediapipe-models/llm_inference/gemma-2b-it-gpu-int8/1/gemma-2b-it-gpu-int8.bin",
+        "https://d7x39115-8000.use.devtunnels.ms/gemma-2b-it-gpu-int8.bin",
     },
   });
   return llmInference;
