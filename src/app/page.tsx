@@ -31,7 +31,7 @@ const apiOptions: LiveClientOptions = {
 export default function Home() {
   console.log("Home page rendered");
   // Authentication state and functions
-  const { user, googleSignIn, handleSignOut } = useAuth();
+  const { user, googleSignIn } = useAuth();
   // Reference to video element for webcam/screen capture display
   const videoRef = useRef<HTMLVideoElement>(null);
   // Current video stream state

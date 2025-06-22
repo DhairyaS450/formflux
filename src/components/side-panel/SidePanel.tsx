@@ -1,6 +1,6 @@
 // Import React icons for UI elements
 import { RiSidebarFoldLine, RiSidebarUnfoldLine } from "react-icons/ri";
-import { FaDiscord, FaHome, FaCog, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaCog, FaUser, FaSignOutAlt } from "react-icons/fa";
 // Import component styles
 import "./side-panel.scss";
 // Import authentication context
@@ -8,6 +8,7 @@ import { useAuth } from "../../../src/contexts/AuthContext";
 // Import React hooks
 import { useState } from "react";
 import cn from "classnames";
+import Image from "next/image";
 
 // Props interface for the SidePanel component
 interface SidePanelProps {
@@ -46,7 +47,7 @@ export default function SidePanel({
       <header className="side-panel-header">
         {/* Logo section - only visible when panel is open */}
         <div className="logo-section">
-          <img src="/logo.png" alt="FormFlux Logo" className="logo" />
+          <Image src="/logo.png" alt="FormFlux Logo" width={120} height={32} className="logo" />
         </div>
         
         {/* Toggle button to expand/collapse the panel */}
@@ -106,7 +107,7 @@ export default function SidePanel({
               {/* User avatar - shows profile picture or default icon */}
               <div className="user-avatar">
                 {user?.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" />
+                  <Image src={user.photoURL} alt="Profile" width={40} height={40} />
                 ) : (
                   <FaUser />
                 )}
