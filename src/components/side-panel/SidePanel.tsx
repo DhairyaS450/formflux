@@ -1,19 +1,27 @@
 // Import React icons for UI elements
 import { RiSidebarFoldLine, RiSidebarUnfoldLine } from "react-icons/ri";
-import { FaDiscord, FaHome, FaCog, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaCog, FaUser, FaSignOutAlt } from "react-icons/fa";
 // Import component styles
 import "./side-panel.scss";
 // Import authentication context
 import { useAuth } from "../../../src/contexts/AuthContext";
 // Import React hooks
 import { useState } from "react";
+import cn from "classnames";
+import Image from "next/image";
 
 // Props interface for the SidePanel component
 interface SidePanelProps {
   onSettingsClick: () => void; // Callback function to open settings dialog
+  onHomeClick: () => void;
+  currentView: "dashboard" | "settings";
 }
 
-export default function SidePanel({ onSettingsClick }: SidePanelProps) {
+export default function SidePanel({
+  onSettingsClick,
+  onHomeClick,
+  currentView,
+}: SidePanelProps) {
   // State to control whether the side panel is expanded or collapsed
   const [open, setOpen] = useState(true);
   
@@ -39,7 +47,7 @@ export default function SidePanel({ onSettingsClick }: SidePanelProps) {
       <header className="side-panel-header">
         {/* Logo section - only visible when panel is open */}
         <div className="logo-section">
-          <img src="/logo.png" alt="FormFlux Logo" className="logo" />
+          <Image src="/logo.png" alt="FormFlux Logo" width={120} height={32} className="logo" />
         </div>
         
         {/* Toggle button to expand/collapse the panel */}
@@ -62,7 +70,12 @@ export default function SidePanel({ onSettingsClick }: SidePanelProps) {
               <div className="section-header">Main</div>
               <ul className="nav-list">
                 {/* Home navigation item - currently active */}
-                <li className="nav-item active">
+                <li
+                  className={cn("nav-item", {
+                    active: currentView === "dashboard",
+                  })}
+                  onClick={onHomeClick}
+                >
                   <FaHome className="nav-icon" />
                   <span className="nav-text">Home</span>
                 </li>
@@ -74,7 +87,12 @@ export default function SidePanel({ onSettingsClick }: SidePanelProps) {
               <div className="section-header">Settings</div>
               <ul className="nav-list">
                 {/* Account settings item - opens settings dialog */}
-                <li className="nav-item" onClick={onSettingsClick}>
+                <li
+                  className={cn("nav-item", {
+                    active: currentView === "settings",
+                  })}
+                  onClick={onSettingsClick}
+                >
                   <FaCog className="nav-icon" />
                   <span className="nav-text">Account</span>
                 </li>
@@ -89,7 +107,7 @@ export default function SidePanel({ onSettingsClick }: SidePanelProps) {
               {/* User avatar - shows profile picture or default icon */}
               <div className="user-avatar">
                 {user?.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" />
+                  <Image src={user.photoURL} alt="Profile" width={40} height={40} />
                 ) : (
                   <FaUser />
                 )}

@@ -1,20 +1,17 @@
 import { useCallback, useState } from "react";
-import Select from "react-select";
 import { useLiveAPIContext } from "../../../src/contexts/LiveAPIContext";
 import { Modality } from "@google/genai";
+import cn from "classnames";
 
 const responseOptions = [
-  { value: "audio", label: "audio" },
-  { value: "text", label: "text" },
+  { value: "audio", label: "Audio" },
+  { value: "text", label: "Text" },
 ];
 
 export default function ResponseModalitySelector() {
   const { config, setConfig } = useLiveAPIContext();
 
-  const [selectedOption, setSelectedOption] = useState<{
-    value: string;
-    label: string;
-  } | null>(responseOptions[0]);
+  const [selectedModality, setSelectedModality] = useState("audio");
 
   const updateConfig = useCallback(
     (modality: "audio" | "text") => {
@@ -24,44 +21,27 @@ export default function ResponseModalitySelector() {
           modality === "audio" ? Modality.AUDIO : Modality.TEXT,
         ],
       });
+      setSelectedModality(modality);
     },
     [config, setConfig]
   );
 
   return (
-    <div className="select-group">
-      <label htmlFor="response-modality-selector">Response modality</label>
-      <Select
-        id="response-modality-selector"
-        className="react-select"
-        classNamePrefix="react-select"
-        styles={{
-          control: (baseStyles) => ({
-            ...baseStyles,
-            background: "var(--Neutral-15)",
-            color: "var(--Neutral-90)",
-            minHeight: "33px",
-            maxHeight: "33px",
-            border: 0,
-          }),
-          option: (styles, { isFocused, isSelected }) => ({
-            ...styles,
-            backgroundColor: isFocused
-              ? "var(--Neutral-30)"
-              : isSelected
-              ? "var(--Neutral-20)"
-              : undefined,
-          }),
-        }}
-        defaultValue={selectedOption}
-        options={responseOptions}
-        onChange={(e) => {
-          setSelectedOption(e);
-          if (e && (e.value === "audio" || e.value === "text")) {
-            updateConfig(e.value);
-          }
-        }}
-      />
+    <div className="response-modality-selector-container">
+      <h2 className="selector-title">Response Modality</h2>
+      <div className="options-grid">
+        {responseOptions.map((option) => (
+          <button
+            key={option.value}
+            className={cn("option-button", {
+              selected: selectedModality === option.value,
+            })}
+            onClick={() => updateConfig(option.value as "audio" | "text")}
+          >
+            <span className="option-label">{option.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

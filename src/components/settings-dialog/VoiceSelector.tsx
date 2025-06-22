@@ -1,30 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
-import Select from "react-select";
 import { useLiveAPIContext } from "../../../src/contexts/LiveAPIContext";
+import cn from "classnames";
 
 const voiceOptions = [
-  { value: "Puck", label: "Puck" },
-  { value: "Charon", label: "Charon" },
-  { value: "Kore", label: "Kore" },
-  { value: "Fenrir", label: "Fenrir" },
-  { value: "Aoede", label: "Aoede" },
+  { value: "Puck", label: "Puck", icon: "/voices/Puck.png" },
+  { value: "Charon", label: "Charon", icon: "/voices/Charon.png" },
+  { value: "Kore", label: "Kore", icon: "/voices/Kore.png" },
+  { value: "Fenrir", label: "Fenrir", icon: "/voices/Fenrir.png" },
+  { value: "Aoede", label: "Aoede", icon: "/voices/Aoede.png" },
 ];
 
 export default function VoiceSelector() {
   const { config, setConfig } = useLiveAPIContext();
 
+  const [selectedVoice, setSelectedVoice] = useState("Puck");
+
   useEffect(() => {
     const voiceName =
-      config.speechConfig?.voiceConfig?.prebuiltVoiceConfig?.voiceName ||
-      "Atari02";
-    const voiceOption = { value: voiceName, label: voiceName };
-    setSelectedOption(voiceOption);
+      config.speechConfig?.voiceConfig?.prebuiltVoiceConfig?.voiceName || "Puck";
+    setSelectedVoice(voiceName);
   }, [config]);
-
-  const [selectedOption, setSelectedOption] = useState<{
-    value: string;
-    label: string;
-  } | null>(voiceOptions[5]);
 
   const updateConfig = useCallback(
     (voiceName: string) => {
@@ -38,45 +33,28 @@ export default function VoiceSelector() {
           },
         },
       });
+      setSelectedVoice(voiceName);
     },
     [config, setConfig]
   );
 
   return (
-    <div className="select-group">
-      <label htmlFor="voice-selector">Voice</label>
-      <Select
-        id="voice-selector"
-        className="react-select"
-        classNamePrefix="react-select"
-        styles={{
-          control: (baseStyles) => ({
-            ...baseStyles,
-            background: "var(--Neutral-15)",
-            color: "var(--Neutral-90)",
-            minHeight: "33px",
-            maxHeight: "33px",
-            border: 0,
-          }),
-          option: (styles, { isFocused, isSelected }) => ({
-            ...styles,
-            backgroundColor: isFocused
-              ? "var(--Neutral-30)"
-              : isSelected
-              ? "var(--Neutral-20)"
-              : undefined,
-          }),
-        }}
-        value={selectedOption}
-        defaultValue={selectedOption}
-        options={voiceOptions}
-        onChange={(e) => {
-          setSelectedOption(e);
-          if (e) {
-            updateConfig(e.value);
-          }
-        }}
-      />
+    <div className="voice-selector-container">
+      <h2 className="selector-title">Voice</h2>
+      <div className="options-grid">
+        {voiceOptions.map((option) => (
+          <button
+            key={option.value}
+            className={cn("option-button", {
+              selected: selectedVoice === option.value,
+            })}
+            onClick={() => updateConfig(option.value)}
+          >
+            <img src={option.icon} alt={option.label} className="option-icon" />
+            <span className="option-label">{option.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
