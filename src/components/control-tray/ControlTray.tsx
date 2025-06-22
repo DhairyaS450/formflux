@@ -205,7 +205,7 @@ function ControlTray({
       
       // Schedule next frame capture
       if (connected) {
-        timeoutId = window.setTimeout(sendVideoFrame, 1000 / 0.5);
+        timeoutId = window.setTimeout(sendVideoFrame, 1000 / 2);
       }
     }
     
@@ -259,6 +259,7 @@ function ControlTray({
       {/* Connection status and control */}
       <div className={cn("connection-container", { connected })}>
         <div className="connection-button-container">
+          <AudioPulse active={connected} volume={volume} />
           {/* Connect/disconnect button */}
           <button
             ref={connectButtonRef}

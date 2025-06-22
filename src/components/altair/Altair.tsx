@@ -23,16 +23,14 @@ import {
   Type,
 } from "@google/genai";
 
-
-
-const repCountDeclaration: FunctionDeclaration = {
-  name: "count_rep",
-  description: "Increments the rep counter by one.",
-  parameters: {
-    type: Type.OBJECT,
-    properties: {},
-  },
-};
+// const repCountDeclaration: FunctionDeclaration = {
+//   name: "count_rep",
+//   description: "Increments the rep counter by one.",
+//   parameters: {
+//     type: Type.OBJECT,
+//     properties: {},
+//   },
+// };
 
 function AltairComponent({ onRepCount }: { onRepCount: () => void }) {
   const [jsonString, setJSONString] = useState<string>("");
@@ -43,7 +41,7 @@ function AltairComponent({ onRepCount }: { onRepCount: () => void }) {
     setConfig({
       responseModalities: [Modality.AUDIO],
       speechConfig: {
-        voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } },
+        voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
       },      
       // proactivity: {
       //   proactiveAudio: true
@@ -56,8 +54,7 @@ function AltairComponent({ onRepCount }: { onRepCount: () => void }) {
 1. ANALYZE exercise form and technique from video/image input
 2. PROVIDE immediate, specific feedback on posture and movement
 3. SUGGEST precise corrections (e.g., "Move your hands 2 inches closer together" or "Lower your hips by 3 inches")
-4. COUNT repetitions and track workout progress. Make sure you are actively counting and using the count_rep function for each rep. 
-5. PREVENT injuries by identifying dangerous form mistakes
+4. PREVENT injuries by identifying dangerous form mistakes
 
 For exercises like push-ups, squats, deadlifts, etc., focus on:
 - Joint alignment and positioning
@@ -66,52 +63,53 @@ For exercises like push-ups, squats, deadlifts, etc., focus on:
 - Common form mistakes
 - Safety considerations
 
+If the user's camera or mic is not working, say so directly. Don't pretend like it is working.
 Always be encouraging while being precise about corrections. Use clear, actionable language. Be very natural and concise.`,
           },
         ],
       },
-      tools: [
-        // there is a free-tier quota for search
-        { googleSearch: {} },
-        { functionDeclarations: [repCountDeclaration] },
-      ],
+      // tools: [
+      //   // there is a free-tier quota for search
+      //   { googleSearch: {} },
+      //   { functionDeclarations: [repCountDeclaration] },
+      // ],
     });
   }, [setConfig, setModel]);
 
-  useEffect(() => {
-    const onToolCall = (toolCall: LiveServerToolCall) => {
-      if (!toolCall.functionCalls) {
-        return;
-      }
+  // useEffect(() => {
+  //   const onToolCall = (toolCall: LiveServerToolCall) => {
+  //     if (!toolCall.functionCalls) {
+  //       return;
+  //     }
 
-      const repFc = toolCall.functionCalls.find(
-        (fc) => fc.name === repCountDeclaration.name
-      );
-      if (repFc) {
-        onRepCount();
-      }
+  //     const repFc = toolCall.functionCalls.find(
+  //       (fc) => fc.name === repCountDeclaration.name
+  //     );
+  //     if (repFc) {
+  //       onRepCount();
+  //     }
 
-      // send data for the response of your tool call
-      // in this case Im just saying it was successful
-      if (toolCall.functionCalls.length) {
-        setTimeout(
-          () =>
-            client.sendToolResponse({
-              functionResponses: toolCall.functionCalls?.map((fc) => ({
-                response: { output: { success: true } },
-                id: fc.id,
-                name: fc.name,
-              })),
-            }),
-          200
-        );
-      }
-    };
-    client.on("toolcall", onToolCall);
-    return () => {
-      client.off("toolcall", onToolCall);
-    };
-  }, [client, onRepCount]);
+  //     // send data for the response of your tool call
+  //     // in this case Im just saying it was successful
+  //     if (toolCall.functionCalls.length) {
+  //       setTimeout(
+  //         () =>
+  //           client.sendToolResponse({
+  //             functionResponses: toolCall.functionCalls?.map((fc) => ({
+  //               response: { output: { success: true } },
+  //               id: fc.id,
+  //               name: fc.name,
+  //             })),
+  //           }),
+  //         200
+  //       );
+  //     }
+  //   };
+  //   client.on("toolcall", onToolCall);
+  //   return () => {
+  //     client.off("toolcall", onToolCall);
+  //   };
+  // }, [client, onRepCount]);
 
   const embedRef = useRef<HTMLDivElement>(null);
 

@@ -32,21 +32,25 @@ export default function AudioPulse({ active, volume, hover }: AudioPulseProps) {
   const lines = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
-    let timeout: number | null = null;
+    let animationFrameId: number | null = null;
     const update = () => {
       lines.current.forEach(
         (line, i) =>
-        (line.style.height = `${Math.min(
-          24,
-          4 + volume * (i === 1 ? 400 : 60),
-        )}px`),
+          (line.style.height = `${Math.min(
+            24,
+            4 + volume * (i === 1 ? 400 : 60)
+          )}px`)
       );
-      timeout = window.setTimeout(update, 100);
+      animationFrameId = window.requestAnimationFrame(update);
     };
 
     update();
 
-    return () => clearTimeout((timeout as number)!);
+    return () => {
+      if (animationFrameId) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [volume]);
 
   return (
