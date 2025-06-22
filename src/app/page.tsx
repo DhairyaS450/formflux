@@ -90,33 +90,79 @@ export default function Home() {
             {/* Conditional rendering based on workout state */}
             {currentView === "dashboard" ? (
               workoutStarted ? (
-                // Active workout interface
-                <main>
-                  <div className="main-app-area">
-                    <div className="counter">{repCount}</div>
-                    {/* AI chat interface */}
-                    <Altair onRepCount={handleRepCount} />
-                    {/* Video stream display */}
-                    <video
-                      className={cn("stream", {
-                        hidden: !videoRef.current || !videoStream,
-                      })}
-                      ref={videoRef}
-                      autoPlay
-                      playsInline
+                <main
+                  style={{
+                    width: '100vw',
+                    height: '100vh',
+                    background: '#000',
+                    overflow: 'hidden',
+                    margin: 0,
+                    padding: 0,
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {/* Video fills the area */}
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                    className={cn('stream', {
+                      hidden: !videoRef.current || !videoStream,
+                    })}
+                  />
+
+                  {/* Rep counter */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 24,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      zIndex: 101,
+                      fontSize: '3rem',
+                      fontWeight: 'bold',
+                      color: '#fff',
+                      textShadow: '0 2px 8px #000, 0 0 2px #000',
+                      background: 'rgba(0,0,0,0.35)',
+                      borderRadius: '1.5rem',
+                      padding: '0.5rem 2.5rem',
+                      letterSpacing: '0.1em',
+                    }}
+                  >
+                    {repCount}
+                  </div>
+
+                  {/* Control tray */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 24,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      zIndex: 102,
+                    }}
+                  >
+                    <ControlTray
+                      videoRef={videoRef}
+                      supportsVideo={true}
+                      onVideoStreamChange={setVideoStream}
+                      onStopWorkout={handleStopWorkout}
                     />
                   </div>
 
-                  {/* Control panel for media and connection */}
-                  <ControlTray
-                    videoRef={videoRef}
-                    supportsVideo={true}
-                    onVideoStreamChange={setVideoStream}
-                    onStopWorkout={handleStopWorkout}
-                  />
+                  {/* AI chat interface */}
+                  <Altair onRepCount={handleRepCount} />
                 </main>
               ) : (
-                // Dashboard interface
                 <main>
                   <WorkoutDashboard onStartWorkout={handleStartWorkout} />
                 </main>
