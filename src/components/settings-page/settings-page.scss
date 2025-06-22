@@ -1,0 +1,159 @@
+.settings-page {
+  flex-grow: 1;
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Center items horizontally
+  justify-content: center; // Center vertically
+  gap: 20px;
+
+  .settings-container {
+    width: 800px;
+    height: 677.61px;
+    color: var(--Neutral-80);
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Center content within the container
+    background: var(--Neutral-10);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border-stroke);
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+  }
+
+  .user-info-container {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 0 0 0.25rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: var(--Neutral-70);
+      margin: 0;
+    }
+  }
+
+  .settings-header {
+    display: flex;
+    justify-content: center; // Center title horizontally
+    align-items: center;
+    padding-bottom: 20px;
+    width: 100%;
+
+    h1 {
+      width: 718px;
+      height: 72px;
+      margin: 0;
+      font-size: 3rem; // Match home page title size
+      font-weight: 400; // Normal font weight
+      color: var(--text); // Match home page title color
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .connected-indicator {
+    font-style: italic;
+    margin-bottom: 16px;
+    background-color: var(--Neutral-10);
+    padding: 1em;
+    border-radius: 8px;
+  }
+
+  .mode-selectors {
+    display: flex;
+    flex-direction: column; // Arrange selectors vertically
+    gap: 2rem; // Add space between selectors
+    padding: 8px 0;
+    width: 100%;
+  }
+
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+}
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 70px;
+  & > label {
+    font-size: 10px;
+  }
+}
+
+.voice-selector-container, .response-modality-selector-container {
+  width: 100%;
+  max-width: 320px; // Set a max-width to make the container smaller
+  margin: 0 auto; // Center the container
+
+  .selector-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-align: center;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; // Reduce gap between buttons
+  }
+
+  .option-button {
+    background-color: var(--Neutral-20);
+    border: 1px solid var(--Neutral-30);
+    border-radius: 8px;
+    padding: 0.5rem 1rem; // Reduced padding to make buttons smaller
+    display: flex;
+    flex-direction: row; // Align items horizontally
+    align-items: center;
+    justify-content: flex-start; // Align content to the left
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    &.selected {
+      background-color: #007bff; // Blue color for selected state
+      border-color: #0056b3; // Darker blue for border
+      color: #fff;
+
+      .option-label {
+        font-weight: 600;
+      }
+    }
+  }
+
+  .option-icon {
+    width: 28px; // Smaller icon size
+    height: 28px; // Smaller icon size
+    margin-right: 0.75rem; // Adjust space between icon and label
+  }
+
+  .option-label {
+    font-size: 0.9rem; // Smaller font size for the label
+    color: var(--Neutral-90);
+  }
+}

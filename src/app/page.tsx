@@ -15,7 +15,7 @@ import { LiveClientOptions } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import LandingPage from "@/components/landing-page/LandingPage";
 import WorkoutDashboard from "@/components/workout-dashboard/WorkoutDashboard";
-import SettingsDialog from "@/components/settings-dialog/SettingsDialog";
+import SettingsPage from "@/components/settings-page/SettingsPage";
 
 // Environment variable for Gemini API key
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY as string;
@@ -39,7 +39,9 @@ export default function Home() {
   // Whether a workout session is currently active
   const [workoutStarted, setWorkoutStarted] = useState(false);
   // Settings dialog visibility state
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<"dashboard" | "settings">(
+    "dashboard"
+  );
   const [repCount, setRepCount] = useState(0);
 
   // Handle Google authentication
@@ -79,8 +81,12 @@ export default function Home() {
         <LiveAPIProvider options={apiOptions}>
           <div className="streaming-console">
             {/* Side navigation panel */}
-            <SidePanel onSettingsClick={() => setSettingsOpen(true)} />
-            
+            <SidePanel
+              currentView={currentView}
+              onHomeClick={() => setCurrentView("dashboard")}
+              onSettingsClick={() => setCurrentView("settings")}
+            />
+
             {/* Conditional rendering based on workout state */}
             {workoutStarted ? (
               // Active workout interface
@@ -150,18 +156,9 @@ export default function Home() {
                 </div>
               </main>
             ) : (
-              // Dashboard interface
-              <main>
-                <WorkoutDashboard onStartWorkout={handleStartWorkout} />
-              </main>
+              <SettingsPage />
             )}
           </div>
-          
-          {/* Settings dialog */}
-          <SettingsDialog
-            open={settingsOpen}
-            onClose={() => setSettingsOpen(false)}
-          />
         </LiveAPIProvider>
       ) : (
         // Landing page for unauthenticated users
