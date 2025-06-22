@@ -30,7 +30,7 @@ export default function SidePanel({
 
   /**
    * Handle user sign out process
-   * Attempts to log out the user and handles any errors
+   * Attempts to log out the user and handles any error
    */
   const handleSignOut = async () => {
     try {

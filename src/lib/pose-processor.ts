@@ -19,8 +19,10 @@ import {
   FilesetResolver,
   NormalizedLandmark,
 } from "@mediapipe/tasks-vision";
+import { LlmInference } from "@mediapipe/tasks-genai";
 
 let poseLandmarker: PoseLandmarker | undefined = undefined;
+let llmInference: LlmInference | undefined = undefined;
 
 // Function to calculate the angle between three landmarks
 function calculateAngle(
@@ -36,6 +38,23 @@ function calculateAngle(
     angle = 360 - angle;
   }
   return angle;
+}
+
+// Initializes the LlmInference model
+export async function createLlmInference(): Promise<LlmInference> {
+  if (llmInference) {
+    return llmInference;
+  }
+  const genai = await FilesetResolver.forGenAiTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@latest/wasm"
+  );
+  llmInference = await LlmInference.createFromOptions(genai, {
+    baseOptions: {
+      modelAssetPath:
+        "https://d7x39115-8000.use.devtunnels.ms/gemma-2b-it-gpu-int8.bin",
+    },
+  });
+  return llmInference;
 }
 
 // Initializes the PoseLandmarker
@@ -90,4 +109,17 @@ export function getPoseAngles(landmarks: NormalizedLandmark[]) {
     leftKnee: calculateAngle(l.hip, l.knee, l.ankle),
     rightKnee: calculateAngle(r.hip, r.knee, r.ankle),
   };
+}
+
+// Generates a text description of the user's pose using the LLM
+export async function getPoseDescription(
+  llm: LlmInference,
+  angles: { [key: string]: number }
+): Promise<string> {
+  const prompt = `You are a fitness assistant. Based on the following joint angles, describe the user's posture in a few words.
+  Angles: ${JSON.stringify(angles, null, 2)}
+  Description:`;
+
+  const result = await llm.generateResponse(prompt);
+  return result;
 }

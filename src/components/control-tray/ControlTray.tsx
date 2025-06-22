@@ -39,10 +39,13 @@ import { AudioRecorder } from "@/lib/audio-recorder";
 import AudioPulse from "@/components/audio-pulse/AudioPulse";
 import "./control-tray.scss";
 import {
+  createLlmInference,
   createPoseLandmarker,
   getPoseAngles,
+  getPoseDescription,
 } from "@/lib/pose-processor";
 import { PoseLandmarker } from "@mediapipe/tasks-vision";
+import { LlmInference } from "@mediapipe/tasks-genai";
 
 // Props interface for the ControlTray component
 export type ControlTrayProps = {
@@ -184,59 +187,55 @@ function ControlTray({
 
   // --- MODIFIED: MediaPipe and Video Processing Logic ---
   const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
-  const lastImageSendTimeRef = useRef<number>(0);
+  const llmInferenceRef = useRef<LlmInference | null>(null);
   const lastPoseSendTimeRef = useRef<number>(0);
   const animationFrameId = useRef<number | null>(null);
 
-  // Initialize MediaPipe PoseLandmarker
+  // Initialize MediaPipe PoseLandmarker and LlmInference
   useEffect(() => {
-    console.log("ControlTray: Initializing MediaPipe PoseLandmarker");
+    console.log(
+      "ControlTray: Initializing MediaPipe PoseLandmarker and LlmInference"
+    );
     async function initializeMediaPipe() {
       poseLandmarkerRef.current = await createPoseLandmarker();
-      console.log("ControlTray: MediaPipe PoseLandmarker initialized");
+      llmInferenceRef.current = await createLlmInference();
+      console.log(
+        "ControlTray: MediaPipe PoseLandmarker and LlmInference initialized"
+      );
     }
     initializeMediaPipe();
   }, []);
 
   // Handle video streaming to AI
   useEffect(() => {
-    console.log("ControlTray: Video processing effect running. Connected:", connected, "ActiveVideoStream:", !!activeVideoStream);
+    console.log(
+      "ControlTray: Video processing effect running. Connected:",
+      connected,
+      "ActiveVideoStream:",
+      !!activeVideoStream
+    );
     if (videoRef.current) {
       videoRef.current.srcObject = activeVideoStream;
     }
 
     const processVideo = async () => {
       const video = videoRef.current;
-      const canvas = renderCanvasRef.current;
       const landmarker = poseLandmarkerRef.current;
+      const llm = llmInferenceRef.current;
 
-      if (connected && landmarker && video && video.readyState >= 2) {
+      if (connected && landmarker && llm && video && video.readyState >= 2) {
         const now = performance.now();
         const poseResults = landmarker.detectForVideo(video, now);
         const nowMs = Date.now();
 
-        // Throttle pose data sending to ~3 FPS (every 333ms)
-        if (nowMs - lastPoseSendTimeRef.current > 333) {
+        // Throttle pose data sending to 1 FPS (every 1000ms)
+        if (nowMs - lastPoseSendTimeRef.current > 1000) {
           // Send pose landmark data
           if (poseResults.landmarks && poseResults.landmarks.length > 0) {
             const angles = getPoseAngles(poseResults.landmarks[0]);
-            client.send([{ text: JSON.stringify(angles) }], false);
+            const description = await getPoseDescription(llm, angles);
+            client.send([{ text: description }], false);
             lastPoseSendTimeRef.current = nowMs;
-          }
-        }
-
-        // Send a full image frame every 2 seconds for context
-        if (nowMs - lastImageSendTimeRef.current > 2000 && canvas) {
-          console.log("ControlTray: Sending image frame");
-          const ctx = canvas.getContext("2d")!;
-          canvas.width = video.videoWidth * 0.25;
-          canvas.height = video.videoHeight * 0.25;
-          if (canvas.width + canvas.height > 0) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const base64 = canvas.toDataURL("image/jpeg", 0.8);
-            const data = base64.slice(base64.indexOf(",") + 1, Infinity);
-            client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
-            lastImageSendTimeRef.current = nowMs;
           }
         }
       }
@@ -246,8 +245,7 @@ function ControlTray({
 
     if (connected && activeVideoStream) {
       console.log("ControlTray: Starting video processing loop");
-      // Reset image timer on connect
-      lastImageSendTimeRef.current = 0;
+      // Reset timer on connect
       lastPoseSendTimeRef.current = 0;
       animationFrameId.current = requestAnimationFrame(processVideo);
     } else {
@@ -269,67 +267,39 @@ function ControlTray({
     <section className="control-tray">
       <canvas ref={renderCanvasRef} className="render-canvas" />
       
-      {/* Action buttons navigation */}
-      <nav className={cn("actions-nav", { disabled: !connected })}>
-        {/* Microphone toggle button */}
-        <button
-          className={cn("action-button mic-button")}
-          onClick={() => setMuted(!muted)}
-        >
-          {!muted ? (
-            <span className="material-symbols-outlined">mic</span>
-          ) : (
-            <span className="material-symbols-outlined">mic_off</span>
-          )}
-        </button>
+      {/* Action buttons are now direct children of the flex container */}
+      <button
+        className={cn("action-button mic-button", { disabled: !connected })}
+        onClick={() => setMuted(!muted)}
+        disabled={!connected}
+      >
+        <span className="material-symbols-outlined">{!muted ? "mic" : "mic_off"}</span>
+      </button>
 
-        {/* Video camera button - only shown if video is supported */}
-        {supportsVideo && (
-          <>
-            <MediaStreamButton
-              isStreaming={webcam.isStreaming}
-              onIcon="videocam_off"
-              offIcon="videocam"
-              start={changeStreams(webcam)}
-              stop={webcam.stop}
-            />
-          </>
-        )}
-        
-        {/* Additional child components */}
-        {children}
-      </nav>
+      {supportsVideo && (
+        <MediaStreamButton
+          isStreaming={webcam.isStreaming}
+          onIcon="videocam_off"
+          offIcon="videocam"
+          start={changeStreams(webcam)}
+          stop={webcam.stop}
+        />
+      )}
+      
+      {children}
+      
+      {/* Connect/disconnect button */}
+      <button
+        ref={connectButtonRef}
+        className={cn("action-button connect-toggle", { connected })}
+        onClick={connected ? disconnect : connect}
+      >
+        <span className="material-symbols-outlined">{connected ? "pause" : "play_arrow"}</span>
+      </button>
 
-      {/* Connection status and control */}
-      <div className={cn("connection-container", { connected })}>
-        <div className="connection-button-container">
-          <AudioPulse active={connected} volume={volume} />
-          {/* Connect/disconnect button */}
-          <button
-            ref={connectButtonRef}
-            className={cn("action-button connect-toggle", { connected })}
-            onClick={() => {
-              console.log(`ControlTray: Connect/Disconnect button clicked. Currently connected: ${connected}`);
-              if (connected) {
-                disconnect();
-              } else {
-                connect();
-              }
-            }}
-          >
-            <span className="material-symbols-outlined">
-              {connected ? "pause" : "play_arrow"}
-            </span>
-          </button>
-        </div>
-        {/* Connection status text */}
-        <span className="text-indicator">Streaming</span>
-      </div>
-      <div className="connection-button-container">
-        <button className="action-button stop-button" onClick={onStopWorkout}>
-          <span className="material-symbols-outlined">stop</span>
-        </button>
-      </div>
+      <button className="action-button stop-button" onClick={onStopWorkout}>
+        <span className="material-symbols-outlined">stop</span>
+      </button>
     </section>
   );
 }
